@@ -3,7 +3,7 @@
 import requests
 import asyncio
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('helium_logger')
 
 import discord
 from discord import ApplicationContext, Option
@@ -52,7 +52,7 @@ class Role_Management:
 		try:
 			members = ctx.guild.fetch_members()
 		except HTTPException as e:
-			logger.info(f'Error on mary_all(): {e}')
+			logger.info(f'Error on update_roles(): {e}')
 			await ctx.respond('Error')
 			return
 
@@ -65,7 +65,8 @@ class Role_Management:
 
 		except Exception as e:
 			logger.info(f'Error on Role_Management.roles(): {e}')
-			ctx.respond('Error while fetching mee6 levels')
+			await ctx.respond('Error while fetching mee6 levels!')
+			return
 		else:
 			data = r.json()
 		level_data = {m['id']: m for m in data['players']}
@@ -124,7 +125,7 @@ class Role_Management:
 		if len(added) > 0:
 			fields = [
 				{
-					'name': f"{user.mention}: {data['new_role'].name}",
+					'name': f"{user.display_name}: {data['new_role'].name}",
 					'value': f"And {len(data['to_remove'])} removed roles" if len(data['to_remove']) > 0 else 'No roles removed'
 				} for user, data in added.items()
 			]
@@ -134,7 +135,7 @@ class Role_Management:
 				"title": 'Roles update!',
 				"description": 'Roles updated for:',
 				"color": 0x0000FF,
-				"fields": []
+				"fields": fields
 			}
 
 		else:
@@ -145,8 +146,9 @@ class Role_Management:
 				"color": 0x0000FF,
 			}
 
-		await ctx.respond(embed=embed)
-	
+		embed = discord.Embed.from_dict(embed)
+		out = await ctx.respond(embed=embed)
+
 	async def generate_roles(self, 
 		ctx : ApplicationContext
 		):

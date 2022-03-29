@@ -7,7 +7,7 @@ import random
 import re
 import time
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('helium_logger')
 
 class Random:
 	"""Random: rand"""

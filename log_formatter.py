@@ -56,7 +56,7 @@ if not os.path.exists('logs'):
 # log_file = f'logs/helium_{datetime.now().isoformat()}.log'
 log_file = 'logs/helium.log'
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('helium_logger')
 logger.setLevel(logging.DEBUG)
 format_args = {
 	'fmt': '%(asctime)s-%(levelname)s: %(message)s',

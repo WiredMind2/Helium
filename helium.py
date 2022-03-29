@@ -24,9 +24,7 @@ import atexit
 # import user_api
 import bot_plugins
 
-logger = logging.getLogger(__name__)
-
-logger.warning('lool')
+logger = logging.getLogger('helium_logger')
 
 # Decorator for command events execution
 def event(name): # Event name

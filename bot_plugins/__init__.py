@@ -1,7 +1,7 @@
 import os
 import importlib
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('helium_logger')
 
 def import_plugins():
 	if __package__ is None:

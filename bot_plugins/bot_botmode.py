@@ -3,7 +3,7 @@
 import discord
 from discord import ApplicationContext, Option
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('helium_logger')
 
 class Bot_mode:
 	"""Bot mode: bot"""

@@ -6,7 +6,7 @@ from discord import ApplicationContext, Option
 import asyncio
 import random
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('helium_logger')
 
 class Misc:
 	"""Misc: misc"""

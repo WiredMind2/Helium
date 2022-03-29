@@ -6,7 +6,7 @@ from discord import ApplicationContext, Option
 import asyncio
 import time
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('helium_logger')
 import re
 from datetime import datetime, timedelta
 

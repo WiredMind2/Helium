@@ -4,7 +4,7 @@ import discord
 from discord.commands.context import ApplicationContext
 from discord.commands import Option
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('helium_logger')
 
 try:
 	from googletrans import Translator, LANGUAGES
