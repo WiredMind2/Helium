@@ -8,16 +8,28 @@ logger = logging.getLogger('helium_logger')
 # Reaction wrapper
 def reaction(action_data):
 	def decorator(func):
-		def wrapper(self, *args, **kwargs):
+		async def wrapper(self, *args, **kwargs):
 			if target is None:
-				action = args['no_target']
+				if 'no_target' in action_data:
+					action = action_data['no_target']
+				else:
+					await ctx.respond('You need to specify a target!')
+					return
 			elif target.id == ctx.author.id:
-				action = 'self_action'
-				# await ctx.respond(f'*{ctx.author.display_name} kisses himself?*')
+				if 'self_action' in action_data:
+					action = action_data['self_action']
+				else:
+					await ctx.respond("You can't do that to yourself!")
+					return
 			else:
-				action = 'action'
-				# await ctx.respond(f'*{ctx.author.display_name} kisses {target.display_name}*')
-			action = '*' + action_data[action].replace(author=ctx.author.display_name, target=target.display_name) + '*'
+				action = action_data['action']
+
+			swaps = {
+				'author':ctx.author.display_name, 
+				'target':target.display_name
+			}
+
+			action = '*' + action.replace(**swaps) + '*'
 		return wrapper
 	return decorator
 
@@ -47,6 +59,10 @@ class Simple_Reactions:
 		}
 		return txt_cmds
 
+	@reaction({
+		'self_action': '{target} is filling up!',
+		'action': '{author} is filling {target}'
+		})
 	async def fill(self, 
 		ctx : ApplicationContext,
 		up : Option(
@@ -62,6 +78,8 @@ class Simple_Reactions:
 			required=True)
 		):
 		"Fill up someone (bruh)"
+
+		print('BYPASSED??')
 
 		if target.id == ctx.author.id:
 			await ctx.respond(f'*{ctx.author.display_name} is filling up*')

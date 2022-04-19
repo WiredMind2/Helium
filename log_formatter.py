@@ -67,6 +67,6 @@ ch = logging.StreamHandler(sys.stdout)
 ch.setFormatter(CustomFormatter(**format_args))
 logger.addHandler(ch)
 
-fh = logging.handlers.RotatingFileHandler(log_file, maxBytes=(1048576*5), backupCount=7)
+fh = logging.handlers.RotatingFileHandler(log_file, maxBytes=(1048576*5), backupCount=7, encoding='utf-8')
 fh.setFormatter(logging.Formatter(**format_args))
 logger.addHandler(fh)

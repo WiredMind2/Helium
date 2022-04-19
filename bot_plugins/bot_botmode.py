@@ -2,8 +2,10 @@
 
 import discord
 from discord import ApplicationContext, Option
+
 import logging
 logger = logging.getLogger('helium_logger')
+import asyncio
 
 class Bot_mode:
 	"""Bot mode: bot"""
@@ -13,11 +15,15 @@ class Bot_mode:
 			self.swap_user: ['ghost', 'imitate', 'swap'],
 		}
 
+		events = {
+			'on_message': self.check_bot_mode
+		}
+
 		# for self.swap_user():
 		if not hasattr(self, 'swaped_users'):
 			self.swaped_users = {}
 
-		return txt_cmds
+		return txt_cmds, events
 
 	async def set_bot_mode(self, 
 		ctx : ApplicationContext,
@@ -82,7 +88,7 @@ class Bot_mode:
 			return
 		if ctx.author.bot:
 			try:
-				await msg.delete()
+				await ctx.interaction.message.delete()
 			except:
 				pass
 
@@ -91,5 +97,49 @@ class Bot_mode:
 			return
 
 		self.swaped_users[ctx.author.id] = user
+
+	async def check_bot_mode(self, msg):
+		if msg.channel.id not in self.bot_mode:
+			return
+
+		if msg.author.bot:
+			return
+
+		if len(msg.attachments) > 0:
+			return
+
+		if msg.type != discord.MessageType.default:
+			return
+
+		perms = msg.channel.permissions_for(msg.guild.me)
+		if not perms.manage_webhooks or not perms.manage_messages:
+			await msg.channel.send("I need the 'Manage Webhooks' and 'Manage Messages' permissions to enable bot mode!")
+			return
+		
+		webhook = await self.get_webhook(msg.channel)
+		if webhook is None:
+			await self.cmds['bot'](msg, 'off')
+			return
+
+		user = self.swaped_users.get(msg.author.id, msg.author)
+
+		data = {
+			'content': msg.content,
+			'username': (user.display_name),
+			'avatar_url': user.avatar, # -> return the whole url for some reason / f'https://cdn.discordapp.com/avatars/{user.id}/{user.avatar}.webp',
+			'tts': msg.tts,
+			'embeds': msg.embeds
+		}
+		a = msg.delete()
+		b = webhook.send(**data)
+		try:
+			await asyncio.gather(a, b)
+		except discord.NotFound:
+			logger.error(f'Exception while using webhook {webhook.name}, channel {webhook.channel.name}: NotFound')
+			del self.webhooks[webhook.channel.id]
+		except discord.HTTPException as e:
+			logger.error(f'Exception while using webhook {webhook.name}, channel {webhook.channel.name}: HTTPException - {e}')
+			del self.webhooks[webhook.channel.id]
+
 
 module_class = Bot_mode

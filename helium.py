@@ -32,8 +32,8 @@ def event(name): # Event name
 		def inner(self, *args, **kwargs): # Actual processing
 			coros = []
 			
-			for event in self.events.get('name', []):
-				f = event()
+			for event in self.events.get(name, []):
+				f = event(*args, **kwargs)
 				if asyncio.iscoroutine(f):
 					coros.append(f)
 			
@@ -47,8 +47,8 @@ def event(name): # Event name
 						await coro
 					except Exception as e:
 						return
-			# return asyncio.gather(*coros)
-			return wait_coros(coros)
+			return asyncio.gather(*coros)
+			# return wait_coros(coros)
 
 		return inner
 	return decorator
@@ -89,7 +89,11 @@ class Bot(commands.Bot, *bot_plugins.plugins):
 			self.txt_cmds |= p_txt_cmds
 
 			if events:
-				self.events |= events
+				for event, cb in events.items():
+					if event in self.events:
+						self.events[event].append(cb)
+					else:
+						self.events[event] = [cb]
 
 		# guild_ids = (e.id for e in self.guilds)
 		# for k,v in self.txt_cmds.items():
@@ -114,6 +118,7 @@ class Bot(commands.Bot, *bot_plugins.plugins):
 		if not hasattr(self, 'bot_mode'):
 			self.bot_mode = []
 
+	@event('on_ready')
 	async def on_ready(self):
 		logger.info(f'{self.user} is online!, ping: {round(self.latency*1000)}ms')
 
@@ -138,8 +143,6 @@ class Bot(commands.Bot, *bot_plugins.plugins):
 				await msg.delete()
 				logger.info(f'DELETED - {msg.author.display_name}: {msg.content}')
 				return
-
-		await self.check_bot_mode(msg)
 
 		if msg.content.startswith(self.prefix) and msg.content != self.prefix:
 			cmd = self.smart_split(msg.content[len(self.prefix):])
@@ -270,7 +273,10 @@ class Bot(commands.Bot, *bot_plugins.plugins):
 			return
 		if msg.author.id != self.admin and msg.author.id in self.banned_list:
 			return
-		logger.info(f'A message was deleted in channel {msg.channel.name}, guild {msg.guild.name}: {msg.content}')
+		content = msg.content
+		if len(msg.attachments) > 0:
+			content += '\n - Attachments: ' + '\n - '.join(map(lambda e: f'{e.filename}: {e.url} / {e.proxy_url}', msg.attachments))
+		logger.info(f'A message was deleted in channel {msg.channel.name}, guild {msg.guild.name}: {content}')
 
 	@event('on_reaction_add')
 	async def on_reaction_add(self, reaction, user):
@@ -336,7 +342,7 @@ class Bot(commands.Bot, *bot_plugins.plugins):
 			if len(hooks) > 0:
 				hook = hooks[0]
 			else:
-				avatar = await self.user.avatar_url.read()
+				avatar = await self.user.avatar.read()
 				try:
 					hook = await channel.create_webhook(
 						name="Helium", 
@@ -374,7 +380,8 @@ class Bot(commands.Bot, *bot_plugins.plugins):
 			'married_users',
 			'marry_requests',
 			'adopted_users',
-			'adopt_requests'
+			'adopt_requests',
+			'mc_log_channel'
 		]
 
 		data = {}

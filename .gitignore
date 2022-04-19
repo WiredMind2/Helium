@@ -1,4 +1,7 @@
 **/__pycache__/
 **/logs/
+*start_mc_logger.*
 
 token_secret.py
+*.code-workspace
+bot_settings

@@ -7,9 +7,10 @@ logger = logging.getLogger('helium_logger')
 import discord
 from discord import ApplicationContext, Option
 
+import random
 from datetime import datetime
 
-class Reaction_Choice:
+class Levels:
 	def initialize(self):
 		txt_cmds = {
 			self.add_xp: ['xp', 'give_xp', 'add_xp'],
@@ -31,7 +32,7 @@ class Reaction_Choice:
 
 		return txt_cmds, events
 
-	def message_xp_level(self, msg):
+	async def message_xp_level(self, msg):
 		author_id = msg.author.id
 
 		minute = datetime.now().time().minute
@@ -48,10 +49,10 @@ class Reaction_Choice:
 			else:
 				self.user_levels[author_id] = xp
 
-	def add_xp(self, 
+	async def add_xp(self, 
 		ctx : ApplicationContext,
 		target : Option(
-			discod.Member,
+			discord.Member,
 			"The member to give xp to",
 			name="member"),
 		amount : Option(
@@ -75,10 +76,10 @@ class Reaction_Choice:
 		else:
 			await ctx.respond(f"Xp of member '{target.display_name}' is now {self.user_levels[target.id]} xp")
 
-	def reset_xp(self, 
+	async def reset_xp(self, 
 		ctx : ApplicationContext,
 		target : Option(
-			discod.Member,
+			discord.Member,
 			"The member to reset the xp",
 			name="member"),
 		):
@@ -93,3 +94,5 @@ class Reaction_Choice:
 			await ctx.respond(f"Resetted xp of member {target.display_name}")
 		else:
 			await ctx.respond(f"Member {target.display_name} has no xp!")
+
+module_class = Levels

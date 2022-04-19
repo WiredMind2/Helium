@@ -25,10 +25,6 @@ class Admin:
 			self.stop: ['stop']
 		}
 
-		events = {
-			'on_message': self.check_bot_mode
-		}
-
 		# for self.block():
 		if not hasattr(self, 'banned_list'):
 			self.banned_list = {}
@@ -197,49 +193,6 @@ class Admin:
 			await ctx.respond(f"{user.display_name} is currently: **BANNED** {l_txt}{r_txt}")
 		else:
 			await ctx.respond(f"{user.display_name} is currently: **UNBANNED**")
-
-	async def check_bot_mode(self, msg):
-		if msg.channel.id not in self.bot_mode:
-			return
-
-		if msg.author.bot:
-			return
-
-		if len(msg.attachments) > 0:
-			return
-
-		if msg.type != discord.MessageType.default:
-			return
-
-		perms = msg.channel.permissions_for(msg.guild.me)
-		if not perms.manage_webhooks or not perms.manage_messages:
-			await msg.channel.send("I need the 'Manage Webhooks' and 'Manage Messages' permissions to enable bot mode!")
-			return
-		
-		webhook = await self.get_webhook(msg.channel)
-		if webhook is None:
-			await self.cmds['bot'](msg, 'off')
-			return
-
-		user = self.swaped_users.get(msg.author.id, msg.author)
-
-		data = {
-			'content': msg.content,
-			'username': (user.display_name),
-			'avatar_url': user.avatar, # -> return the whole url for some reason / f'https://cdn.discordapp.com/avatars/{user.id}/{user.avatar}.webp',
-			'tts': msg.tts,
-			'embeds': msg.embeds
-		}
-		a = msg.delete()
-		b = webhook.send(**data)
-		try:
-			await asyncio.gather(a, b)
-		except discord.HTTPException as e:
-			logger.error(f'Exception while using webhook {webhook.name}, channel {webhook.channel.name}: HTTPException - {e}')
-			del self.webhooks[webhook.channel.id]
-		except discord.NotFound:
-			logger.error(f'Exception while using webhook {webhook.name}, channel {webhook.channel.name}: NotFound')
-			del self.webhooks[webhook.channel.id]
 
 	async def rename(self, 
 		ctx : ApplicationContext,

@@ -26,7 +26,7 @@ class Reaction_Choice:
 
 		return txt_cmds, events
 
-	def choice_create(self, 
+	async def choice_create(self, 
 		ctx : ApplicationContext,
 		title : Option(
 			str,
@@ -76,7 +76,7 @@ class Reaction_Choice:
 
 		self.choices_data[m_id] = data
 
-	def choice_modify(self, 
+	async def choice_modify(self, 
 		ctx : ApplicationContext,
 		title : Option(
 			str,
@@ -128,7 +128,7 @@ class Reaction_Choice:
 
 		self.choices_data[data['id']] = data
 
-	def choice_add_reaction(self, 
+	async def choice_add_reaction(self, 
 		ctx : ApplicationContext,
 		title : Option(
 			str,
@@ -180,7 +180,7 @@ class Reaction_Choice:
 		data['reactions'].append(reaction)
 		self.choices_data[m_id] = data
 
-	def choice_remove_reaction(self, 
+	async def choice_remove_reaction(self, 
 		ctx : ApplicationContext,
 		title : Option(
 			str,
@@ -219,7 +219,7 @@ class Reaction_Choice:
 			await ctx.respond(f"Role '{role.name}' hasn't been added on reaction with title '{title}'!")
 			return
 
-	def choice_delete(self, 
+	async def choice_delete(self, 
 		ctx : ApplicationContext,
 		title : Option(
 			str,
@@ -247,7 +247,7 @@ class Reaction_Choice:
 		await msg.delete() # TODO - Errors handling
 		del self.choices_data[m_id]
 
-	def check_reaction(self, reaction, user):
+	async def check_reaction(self, reaction, user):
 		m_id = reaction.msg.id
 		if m_id in self.choices_data:
 			data = self.choices_data[m_id]
@@ -276,3 +276,5 @@ class Reaction_Choice:
 		}
 
 		return emb, emojis
+
+module_class = Reaction_Choice
