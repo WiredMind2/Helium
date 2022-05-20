@@ -286,4 +286,4 @@ def setup(bot):
 
 bot = commands.Bot()
 setup(bot)
-bot.run('NzIwODYwNzIwNTA5NDg1MDg4.XuMH3A.zVnfETB2fe2lX1v8YLZdZ8o9ijQ')
+bot.run(helium)
