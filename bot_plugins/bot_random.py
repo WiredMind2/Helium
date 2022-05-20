@@ -1,7 +1,7 @@
 #Discord_bot.py random module
 
 import discord
-from discord import ApplicationContext, Option
+from discord import Option
 
 import random
 import re
@@ -23,7 +23,7 @@ class Random:
 		return txt_cmds
 
 	async def dice(self, 
-		ctx : ApplicationContext,
+		ctx,
 		hi : Option(
 			int,
 			"Max value", 
@@ -45,7 +45,7 @@ class Random:
 		await ctx.respond(f'{num} {random.choice(entities)}')
 
 	async def choose(self, 
-		ctx : ApplicationContext,
+		ctx,
 		choices : Option(
 			str,
 			"List of things to choose from",
@@ -63,7 +63,7 @@ class Random:
 		await ctx.respond(f'I choose {random.choice(args)}!')
 
 	async def fight(self, 
-		ctx : ApplicationContext,
+		ctx,
 		args : Option(
 			str,
 			"List of fighters",
@@ -76,10 +76,10 @@ class Random:
 			await ctx.respond("You can't fight yourself??")
 			return
 		elif len(args) == 1:
-			if ctx.interaction.user.mention == args[0]:
+			if ctx.author.mention == args[0]:
 				await ctx.respond("You can't fight yourself??")
 				return
-			args.append(ctx.interaction.user.mention)
+			args.append(ctx.author.mention)
 
 		rgx = re.compile(r'<@[&!]?(\d{17,19})>')
 
@@ -88,9 +88,9 @@ class Random:
 			m = re.match(rgx, f)
 			if m:
 				u_id = int(m.groups()[0])
-				f = ctx.message.guild.get_member(u_id).display_name
+				f = ctx.guild.get_member(u_id).display_name
 			else:
-				match = discord.utils.find(lambda e: f.lower() in e.name.lower() and hasattr(e, 'name'), ctx.interaction.guild.members)
+				match = discord.utils.find(lambda e: f.lower() in e.name.lower() and hasattr(e, 'name'), ctx.guild.members)
 				if match:
 					f = match.display_name
 
@@ -214,7 +214,7 @@ class Random:
 		await ctx.respond(embeds=game_embeds)
 
 	async def kill(self, 
-		ctx : ApplicationContext,
+		ctx,
 		target : Option(
 			discord.Member,
 			"The target to kill",
@@ -240,7 +240,7 @@ class Random:
 			self.banned_list[ctx.author.id] = (delay, f'Killed while trying to assassinate {target.display_name}')
 
 	async def suicide(self, 
-		ctx : ApplicationContext
+		ctx
 		):
 		"Kill yourself: \n > .suicide"
 

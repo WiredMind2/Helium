@@ -1,7 +1,6 @@
 #Discord_bot.py misc module
 
 import discord
-from discord import ApplicationContext, Option
 
 import asyncio
 import random
@@ -12,7 +11,7 @@ class Misc:
 	"""Misc: misc"""
 	def initialize(self):
 		txt_cmds = {
-			self.help: ['doc', 'docs', 'help'],
+			self.help: ['doc', 'docs'],#, 'help'],
 			self.salute: ['hello', 'hey', 'hi', 'salute', 'test'],
 			self.say: ['say'],
 			self.repeat: ['parrot', 'repeat'],
@@ -28,31 +27,33 @@ class Misc:
 
 		return txt_cmds
 
+	@discord.option(
+		'user',
+		description="The user to salute",
+	)
 	async def salute(self, 
-		ctx : ApplicationContext,
-		user : Option(
-			discord.Member,
-			"The user to salute", 
-			name="user",
-			default=None)
+		ctx,
+		user : discord.Member = None
 		):
 		"Helium is a very polite bot: \n .hi @Helium"
 		if user is None:
-			user = ctx.user
+			user = ctx.author
 		txts = ['Hey {user}!', 'Hello {user}!', 'Good day to you, {user}!', 'Greetings, {user}, how are you today?']
 		await ctx.respond(random.choice(txts).format(user=user.display_name))
 
+	@discord.option(
+		'content',
+		decription="The message to repeat"
+	)
 	async def say(self, 
-		ctx : ApplicationContext,
-		content : Option(
-			str,
-			"The message to repeat", 
-			name="message")
+		ctx,
+		content : str
 		):
 		"Will repeat the content of your message:\n > .say I like pasta!"
 		if len(content) == 0:
-			await msg.channel.send('What am I supposed to say?')
+			await ctx.respond('What am I supposed to say?')
 			return
+
 		replacements = {
 			'@here': '@​here',
 			'@everyone': '@​everyone',
@@ -60,33 +61,31 @@ class Misc:
 		}
 		for txt, rep in replacements.items():
 			content = content.replace(txt, rep)
-		a = ctx.send(content)
-		b = ctx.message.delete()
-		try:
-			await asyncio.gather(a, b)
-		except discord.NotFound:
-			pass
 
+		await ctx.replace(content)
+
+	@discord.option(
+		'amount',
+		description="Number of messages to send"
+	)
+	@discord.option(
+		'content',
+		description="Message to send",
+	)
+	@discord.option(
+		'delay',
+		description="Delay between messages"
+	)
+	@discord.option(
+		'counter',
+		description="Add a number before each message"
+	)
 	async def spam(self, 
-		ctx : ApplicationContext,
-		amount : Option(
-			int,
-			"Number of messages to send", 
-			name="amount"),
-		content : Option(
-			str,
-			"Message to send", 
-			name="message"),
-		delay : Option(
-			int,
-			"Delay between messages", 
-			name="delay", 
-			default=1),
-		log_count : Option(
-			bool,
-			"Log the count of each message",
-			name="log_count",
-			default=True)
+		ctx,
+		amount : int,
+		content : str,
+		delay : int = 1,
+		log_count : bool = True
 		):
 		"Spam a message:\n > .spam 20 I like pasta!"
 		if len(content) == 0:
@@ -112,50 +111,58 @@ class Misc:
 				logger.warn(f'Error while spamming (iter n{i+1}): {e}')
 			await asyncio.sleep(delay)
 
+	@discord.option(
+		'user',
+		description="User to ping"
+	)
 	async def ping(self, 
-		ctx : ApplicationContext,
-		user : Option(
-			discord.User,
-			"User to ping",
-			name="user",
-			default=None) = None
+		ctx,
+		user : discord.User = None
 		):
 		"Ping the bot:\n > .ping\nAlso works like .mention:\n > .ping helium"
 		if user is not None:
 			return await self.mention(ctx, user)
 		await ctx.respond(f"Pong: {round(self.latency*1000)}ms")
 
+	@discord.option(
+		'cat',
+		description="A category or a command",
+	)
 	async def help(self, 
-		ctx : ApplicationContext,
-		cat : Option(
-			str,
-			"A category or a command", 
-			name="cat",
-			default=None) = None,
+		ctx,
+		cat : str = None,
 		):
 		"Show Helium's help:\n > .help (cat)"
 
-		if cat is None:
+		if cat is None: # Main page
 			cats = []
-			for i, p in enumerate(self.plugins):
-				name, arg = p.__doc__.split(':')
-				name, arg = name.strip(), arg.strip()
-				
-				count = len(p.initialize(self))
+			i = 0
+			for p in self.plugins:
+				try:
+					name, arg = p.__doc__.split(':')
+					name, arg = name.strip(), arg.strip()
+					if name.startswith('(Admin)'):
+						continue
 
-				field = {
-					'name': name,
-					'value': f'{count} commands:\n > .help {arg}\n',
-					'inline': True
-				}
-				cats.append(field)
+					count = len(p.initialize(self))
 
-				if i%2 == 1:
-					cats.append({
-						'name': '​',
-						'value': '​',
+					field = {
+						'name': name,
+						'value': f'{count} commands:\n > .help {arg}\n',
 						'inline': True
-					})
+					}
+					cats.append(field)
+
+					if i%2 == 1:
+						cats.append({
+							'name': '​',
+							'value': '​',
+							'inline': True
+						})
+					i += 1
+				except Exception as e:
+					logger.warn(f'Error on help, module {p}: {e}')
+					pass
 
 			emb = {
 				"type": "rich",
@@ -169,13 +176,29 @@ class Misc:
 			await ctx.respond(embed=emb)
 			return
 
+		# Plugin help page
 		p = filter(lambda p: p.__doc__.split(':')[1].strip() == cat, self.plugins)
-		p = next(p)
+		p = next(p, None)
+
+		if p is None: # Cat not found
+			emb = {
+				"type": "rich",
+				"title": f"Helium's help - {name}",
+				"description": f"Module '{name}' is not found!",
+				"color": 0x00FFFF
+			}
+
+			emb = discord.Embed.from_dict(emb)
+			await ctx.respond(embed=emb)
+			return
+
 
 		txt_cmds = p.initialize(self)
+		if isinstance(txt_cmds, tuple):
+			txt_cmds = txt_cmds[0]
 		docs = []
 		for f, keys in txt_cmds.items():
-			if f.__doc__ is not None:
+			if f.__doc__ is not None and '(admin only!)' not in f.__doc__:
 				field = {
 					'name': ' | '.join(map(lambda e: '.' + e, keys)),
 					'value': f.__doc__
@@ -196,12 +219,13 @@ class Misc:
 		emb = discord.Embed.from_dict(emb)
 		await ctx.respond(embed=emb)
 
+	@discord.option(
+		'user',
+		description="User to ping",
+	)
 	async def mention(self, 
-		ctx : ApplicationContext,
-		user : Option(
-			discord.User,
-			"User to ping",
-			name="user")
+		ctx,
+		user : discord.User
 		):
 		"Ping somebody:\n > .ping helium"
 
@@ -216,29 +240,28 @@ class Misc:
 		# if hasattr(match, 'position') and match.position == 0:
 		# 	await msg.channel.send("You can ping @​everyone yourself! (I don't want any troubles)")
 		# 	return 
-		a = ctx.send(user.mention)
-		b = ctx.message.delete()
 		try:
-			await asyncio.gather(a, b)
+			ctx.replace(user.mention)
 		except discord.NotFound as e:
 			logger.info(f'Error on .say: {e}')
 
+	@discord.option(
+		'user',
+		description="The target",
+	)
+	@discord.option(
+		'action',
+		description="Start or stop",
+		choices=["start", "stop"],
+	)
 	async def repeat(self, 
-		ctx : ApplicationContext,
-		user : Option(
-			discord.Member,
-			"The target",
-			name="user"),
-		action : Option(
-			str,
-			"Action",
-			name="action",
-			choices=["start", "stop", None],
-			default=None)
+		ctx,
+		user : discord.Member,
+		action : str = None
 		):
 		"Act like a parrot:\n > .repeat (start/stop/?) @user"
 
-		if user.id == ctx.user.id and not user.top_role.permissions.manage_messages:
+		if user.id == ctx.author.id and not user.top_role.permissions.manage_messages:
 			await ctx.respond("You can't do this yourself!")
 			return
 
@@ -261,12 +284,13 @@ class Misc:
 			await ctx.respond(f"I will stop to repeat {user.display_name}")
 			return
 
+	@discord.option(
+		'max_count',
+		description="Count up to ...",
+	)
 	async def count(self, 
-		ctx : ApplicationContext,
-		max_count : Option(
-			int,
-			"Count up to ...",
-			name="count")
+		ctx,
+		max_count : int
 		):
 
 		for i in range(1, max_count+1):

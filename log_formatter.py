@@ -49,24 +49,25 @@ class CustomFormatter(logging.Formatter):
 
 		return formatter.format(record)
 
-# Logging setup
-if not os.path.exists('logs'):
-	os.mkdir('logs')
+def setup_logs():
+	# Logging setup
+	if not os.path.exists('logs'):
+		os.mkdir('logs')
 
-# log_file = f'logs/helium_{datetime.now().isoformat()}.log'
-log_file = 'logs/helium.log'
+	# log_file = f'logs/helium_{datetime.now().isoformat()}.log'
+	log_file = 'logs/helium.log'
 
-logger = logging.getLogger('helium_logger')
-logger.setLevel(logging.DEBUG)
-format_args = {
-	'fmt': '%(asctime)s-%(levelname)s: %(message)s',
-	'datefmt': '%H:%M:%S'
-}
+	logger = logging.getLogger('helium_logger')
+	logger.setLevel(logging.DEBUG)
+	format_args = {
+		'fmt': '%(asctime)s-%(levelname)s: %(message)s',
+		'datefmt': '%H:%M:%S'
+	}
 
-ch = logging.StreamHandler(sys.stdout)
-ch.setFormatter(CustomFormatter(**format_args))
-logger.addHandler(ch)
+	ch = logging.StreamHandler(sys.stdout)
+	ch.setFormatter(CustomFormatter(**format_args))
+	logger.addHandler(ch)
 
-fh = logging.handlers.RotatingFileHandler(log_file, maxBytes=(1048576*5), backupCount=7, encoding='utf-8')
-fh.setFormatter(logging.Formatter(**format_args))
-logger.addHandler(fh)
+	fh = logging.handlers.RotatingFileHandler(log_file, maxBytes=(1048576*5), backupCount=7, encoding='utf-8')
+	fh.setFormatter(logging.Formatter(**format_args))
+	logger.addHandler(fh)

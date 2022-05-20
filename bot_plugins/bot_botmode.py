@@ -1,7 +1,7 @@
 #Discord_bot.py random module
 
 import discord
-from discord import ApplicationContext, Option
+from discord import Option
 
 import logging
 logger = logging.getLogger('helium_logger')
@@ -26,7 +26,7 @@ class Bot_mode:
 		return txt_cmds, events
 
 	async def set_bot_mode(self, 
-		ctx : ApplicationContext,
+		ctx,
 		mode : Option(
 			str,
 			"Action",
@@ -73,13 +73,13 @@ class Bot_mode:
 		else:
 			await ctx.respond('Bot mode: **DISABLED**')
 
+	@discord.option(
+		'user',
+		description="User to swap with"
+	)
 	async def swap_user(self, 
-		ctx : ApplicationContext,
-		user : Option(
-			discord.Member,
-			"User to swap with",
-			name="user",
-			default=None)
+		ctx,
+		user : discord.Member = None
 		):
 		"While in bot mode, allow you to talk as someone else:\n > .swap @user"
 
@@ -87,10 +87,11 @@ class Bot_mode:
 			await ctx.respond('You must activate bot mode first!')
 			return
 		if ctx.author.bot:
-			try:
-				await ctx.interaction.message.delete()
-			except:
-				pass
+			if ctx.message is not None:
+				try:
+					await ctx.message.delete()
+				except:
+					pass
 
 		if user is None:
 			del self.swaped_users[ctx.author.id]

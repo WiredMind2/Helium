@@ -1,7 +1,7 @@
 #Discord_bot.py admin module
 
 import discord
-from discord import ApplicationContext, Option
+from discord.commands.options import Option
 
 import asyncio
 import time
@@ -17,8 +17,10 @@ class Admin:
 			self.block: ['ban', 'block', 'mute'],
 			self.unban: ['unban', 'pardon'],
 			self.banned: ['banned'],
+			self.block_role: ['role_ban'],
 			self.delete: ['del', 'delete', 'purge', 'remove', 'rm'],
 			self.rename: ['nick', 'rename'],
+			self.rename_all: ['rename_all'],
 			self.get_link: ['invite', 'link', 'share'],
 			self.set_activity: ['activity', 'set_activity'],
 			self.set_status: ['set_status', 'status'],
@@ -32,7 +34,7 @@ class Admin:
 		return txt_cmds
 
 	async def block(self, 
-		ctx : ApplicationContext,
+		ctx,
 		user : Option(
 			discord.Member,
 			"The user to ban",
@@ -40,11 +42,10 @@ class Admin:
 		delay : Option(
 			str,
 			"The delay before unbanning (5sec/2h/5days/...)",
-			name="delay",
-			default=None)=None,
+			name="delay"),
 		reason : Option(
 			str,
-			"The reason of this ban",
+			"The reason for this ban",
 			name="reason",
 			default=None)=None
 		):
@@ -60,9 +61,13 @@ class Admin:
 				await ctx.respond(f'{delay} has not been recognized as a valid delay!')
 				return
 		else:
+			# Shouldn't happen
+			await ctx.respond('You must specify a delay!')
+			return
 			amount, unit, length = None, None, None
 
-		if ctx.interaction.user.id != self.admin and ctx.interaction.user.top_role.position < user.top_role.position:
+		print(ctx.author, user, delay)
+		if not self.is_admin(ctx.author) and ctx.author.top_role.position < user.top_role.position:
 			await ctx.respond(f'You can\'t ban someone with a higher rank than you!')
 			return
 
@@ -79,6 +84,33 @@ class Admin:
 		self.banned_list[user.id] = (length, reason)
 		
 		await ctx.respond(f"{user.display_name}: **BANNED**{l_txt}{r_txt}")
+
+	async def block_role(self, 
+		ctx,
+		role : Option(
+			discord.Role,
+			"The role to ban",
+			name="user"),
+		delay : Option(
+			str,
+			"The delay before unbanning (5sec/2h/5days/...)",
+			name="delay",
+			default=None)=None,
+		reason : Option(
+			str,
+			"The reason of this ban",
+			name="reason",
+			default=None)=None
+		):
+		"Mute everyone having a role:\n > .ban @role (5sec/2h/5days/...)"
+
+		coros = []
+		for member in role.members:
+			c = self.block(ctx, member, delay, reason)
+			coros.append(c)
+
+		await asyncio.gather(*coros)
+		await ctx.respond(f'Banned all members with role: {role.name}')
 
 	def get_block_delay(self, arg):
 		units = {
@@ -121,7 +153,7 @@ class Admin:
 		return amount, unit, length
 
 	async def unban(self, 
-		ctx : ApplicationContext,
+		ctx,
 		user : Option(
 			discord.Member,
 			"The user to ban",
@@ -134,11 +166,12 @@ class Admin:
 		):
 		"Unban someone:\n > .unban @user"
 
-		if ctx.interaction.user.id != self.admin and ctx.interaction.user.top_role.position < user.top_role.position:
+		# TODO - broken lmao
+		if not self.is_admin(ctx.author) and ctx.author.top_role.position < user.top_role.position:
 			await ctx.respond(f'You can\'t unban someone with a higher rank than you!')
 			return
 
-		if user.id == ctx.interaction.user.id and user.id != self.admin:
+		if user.id == ctx.author.id and not self.is_admin(user.id):
 			await ctx.respond(f'You can\'t unban yourself!')
 			return
 
@@ -155,7 +188,7 @@ class Admin:
 			await ctx.respond(f"{user.display_name} isn't banned!")
 
 	async def banned(self, 
-		ctx : ApplicationContext,
+		ctx,
 		user : Option(
 			discord.Member,
 			"The banned user",
@@ -165,8 +198,48 @@ class Admin:
 		"Check if a user if banned:\n > .banned @user"
 
 		if user is None:
-			user = ctx.interaction.user
+			ids = set(self.banned_list)
 
+			fields = []
+			async for member in ctx.guild.fetch_members():
+				if member.id in ids:
+					data = self.get_banned_text(member, embed=True)
+					fields.append(data)
+
+			if fields == []:
+				embed = {
+					"type": "rich",
+					"title": 'No one is currently banned!',
+					"description": 'Everybody can speak their mind freely!',
+					"color": 0x0000FF,
+					"footer": {
+						'text': 'Use .ban to temporarily ban someone'
+					}
+				}
+			else:
+				if len(fields) == 1:
+					desc = 'One person is currently banned'
+				else:
+					desc = f'{len(fields)} peoples are currently banned:'
+
+				embed = {
+					"type": "rich",
+					"title": f'Bans on {ctx.guild.name}',
+					"description": desc,
+					"color": 0x0000FF,
+					"fields": fields,
+					"footer": {
+						'text': 'Use .unban to unban someone'
+					}
+				}
+
+			embed = discord.Embed.from_dict(embed)
+			await ctx.respond(embed=embed)
+		else:
+			txt = self.get_banned_text(user)
+			await ctx.respond(txt)
+
+	def get_banned_text(self, user, embed=False):
 		if user.id in self.banned_list:
 			delay, reason = self.banned_list[user.id]
 			if delay is None:
@@ -190,12 +263,24 @@ class Admin:
 			else:
 				r_txt = f' - {reason}'
 
-			await ctx.respond(f"{user.display_name} is currently: **BANNED** {l_txt}{r_txt}")
+			if embed:
+				return {
+					'name': user.display_name,
+					'value': f"**BANNED** {l_txt}{r_txt}"
+				}
+			else:
+				return f"{user.display_name} is currently: **BANNED** {l_txt}{r_txt}"
 		else:
-			await ctx.respond(f"{user.display_name} is currently: **UNBANNED**")
+			if embed:
+				return {
+					'name': user.display_name,
+					'value': f"**UNBANNED**"
+				}
+			else:
+				return f"{user.display_name} is currently: **UNBANNED**"
 
 	async def rename(self, 
-		ctx : ApplicationContext,
+		ctx,
 		name : Option(
 			str,
 			"The new name",
@@ -210,7 +295,7 @@ class Admin:
 		"Rename someone, leave empty to reset: .nick Helium @Helium"
 
 		if user is None:
-			user = ctx.interaction.user
+			user = ctx.author
 
 		old_name = user.display_name
 
@@ -230,8 +315,44 @@ class Admin:
 				name = user.name
 			await ctx.respond(f'Renamed {old_name} to {name}')
 
+	async def rename_all(self,
+		ctx,
+		name : Option(
+			str,
+			"The new name",
+			name="name",
+			default=None) = None,
+		):
+		"Rename everyone on the guild (admin only)"
+
+		async def no_error_rename(user, name):
+			try:
+				await user.edit(nick=name)
+			except discord.Forbidden as e:
+				logger.error(e)
+				# await ctx.respond("I don't have the 'Manage Nicknames' permission!")
+			except Exception as e:
+				logger.warn(f'Error while renaming {user.display_name}: {e}')
+				# await ctx.respond('Error')
+
+		if not self.is_admin(ctx.author):
+			await ctx.respond('This is an admin only command!')
+			return
+
+		await ctx.defer()
+
+		coros = []
+		async for user in ctx.guild.fetch_members():
+			if user.nick != name:
+				c = no_error_rename(user, name)
+				coros.append(c)
+
+		await asyncio.gather(*coros)
+
+		await ctx.respond('Renamed all users!')
+
 	async def delete(self, 
-		ctx : ApplicationContext,
+		ctx,
 		from_user : Option(
 			discord.User,
 			"Only delete messages from this user", 
@@ -245,15 +366,15 @@ class Admin:
 		):
 		"Purge all messages sent after the referenced message (from user):\n > .purge (@user)\n(Admin only!)"
 		
-		if ctx.author.id != self.admin:
+		if not self.is_admin(ctx.author):
 			await ctx.respond('Only the bot\'s admin can use this command!')
 			return
 
-		if not ctx.channel.permissions_for(ctx.user).manage_messages:
+		if not ctx.channel.permissions_for(ctx.author).manage_messages:
 			await ctx.respond("You don't have the 'Manage Messages' permission!")
 			return
 
-		ref = ctx.interaction.message.reference
+		ref = ctx.message.reference
 		if msg_id is not None:
 			msg = await ctx.fetch_message(msg_id)
 		elif ref is not None and ref.resolved is not None:
@@ -270,9 +391,9 @@ class Admin:
 			return
 
 		if from_user is not None:
-			check = lambda e: e.id != ctx.interaction.id and e.author.id == from_user.id
+			check = lambda e: e.id != ctx.message.id and e.author.id == from_user.id
 		else:
-			check = lambda e: e.id != ctx.interaction.id
+			check = lambda e: e.id != ctx.message.id
 
 		try:
 			a = ctx.channel.purge(check=check, after=beginning)	
@@ -291,7 +412,7 @@ class Admin:
 		await ctx.channel.send(f'Purged all messages since {date_txt}')
 
 	async def get_link(self, 
-		ctx : ApplicationContext
+		ctx,
 		):
 		"Please invite Helium in your server!"
 		
@@ -365,7 +486,7 @@ class Admin:
 		await asyncio.gather(a, b)
 
 	async def stop(self, msg, *args):
-		if msg.author.id != self.admin:
+		if not self.is_admin(msg.author):
 			await msg.channel.send("You are not allowed to stop the bot!")
 			return
 		await msg.channel.send("Bye!")

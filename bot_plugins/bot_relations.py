@@ -1,7 +1,6 @@
 #Discord_bot.py relations module
 
 import discord
-from discord.commands.context import ApplicationContext
 from discord.commands import Option
 import logging
 logger = logging.getLogger('helium_logger')
@@ -35,7 +34,7 @@ class Relations:
 		return txt_cmds
 
 	async def marry(self, 
-		ctx : ApplicationContext,
+		ctx,
 		user : Option(
 			discord.Member,
 			"Your groom / bride",
@@ -121,7 +120,7 @@ class Relations:
 		self.save_settings()
 
 	async def married(self, 
-		ctx : ApplicationContext
+		ctx
 		):
 		"List all married members"
 
@@ -167,7 +166,7 @@ class Relations:
 			await ctx.respond('There are no couple on this guild!')
 
 	async def dump(self, 
-		ctx : ApplicationContext,
+		ctx,
 		user : Option(
 			discord.Member,
 			"The one you want to dump",
@@ -195,7 +194,7 @@ class Relations:
 			await ctx.respond(f"You're not married with {user.display_name}!")
 
 	async def marry_all(self,
-		ctx : ApplicationContext,
+		ctx,
 		target : Option(
 			discord.Member,
 			"Who should be married with everybody else",
@@ -204,7 +203,7 @@ class Relations:
 		):
 		"Wanna marry @everyone? (Admin only)"
 
-		if ctx.author.id != self.admin:
+		if not self.is_admin(ctx.author):
 			await ctx.respond('Only the bot\'s admin can use this command!')
 
 		self.marry_requests = {int(k):v for k,v in self.marry_requests.items()} # Json can't convert keys back to int ?
@@ -214,7 +213,7 @@ class Relations:
 		count = 0
 		try:
 			members = ctx.guild.fetch_members()
-		except HTTPException as e:
+		except discord.HTTPException as e:
 			logger.warn(f'Error on mary_all(): {e}')
 			await ctx.respond('Error')
 			return
@@ -250,7 +249,7 @@ class Relations:
 		await ctx.respond(f'{target.display_name} has been married with {count} new peoples. (Total {total})')
 
 	async def adopt(self, 
-		ctx : ApplicationContext,
+		ctx,
 		user : Option(
 			discord.Member,
 			"Your futur child",
@@ -339,7 +338,7 @@ class Relations:
 		self.save_settings()
 
 	async def adopted(self, 
-		ctx : ApplicationContext
+		ctx
 		):
 		"List all adopted members"
 
@@ -393,7 +392,7 @@ class Relations:
 			await ctx.respond('Nobody has been adopted yet!')
 
 	async def emancipate(self, 
-		ctx : ApplicationContext,
+		ctx,
 		user : Option(
 			discord.Member,
 			"The child you want to emancipate",
@@ -403,7 +402,7 @@ class Relations:
 		"Wanna get rid of your children?"
 
 		parent = ctx.author
-		parent_id = author.id
+		parent_id = parent.id
 		child = user
 		child_id = user.id
 
@@ -415,7 +414,7 @@ class Relations:
 		if parent_id == self.adopted_users[child_id]:
 			del self.adopted_users[child_id]
 
-			await ctx.respond(f'{author.mention} got rid of {user.mention}!')
+			await ctx.respond(f'{parent.mention} got rid of {user.mention}!')
 
 		else:
 			await ctx.respond(f"You're not a parent of {user.display_name}!")

@@ -1,11 +1,11 @@
 #Discord_bot.py reactions module
 
 import discord
-from discord import ApplicationContext, Option
+from discord import Option
 import logging
 logger = logging.getLogger('helium_logger')
 
-# Reaction wrapper
+# Reaction wrapper - TODO
 def reaction(action_data):
 	def decorator(func):
 		async def wrapper(self, *args, **kwargs):
@@ -55,7 +55,8 @@ class Simple_Reactions:
 			self.win: ['win', 'wins'],
 			self.lost: ['lose', 'lost', 'loses'],
 			self.pan: ['pan', 'throw_pan'],
-			self.laugh: ['laugh', 'laughs', 'lol']
+			self.laugh: ['laugh', 'laughs', 'lol'],
+			self.leave: ['leave', 'left']
 		}
 		return txt_cmds
 
@@ -64,7 +65,7 @@ class Simple_Reactions:
 		'action': '{author} is filling {target}'
 		})
 	async def fill(self, 
-		ctx : ApplicationContext,
+		ctx,
 		up : Option(
 			str,
 			"'up' keyword",
@@ -87,7 +88,7 @@ class Simple_Reactions:
 			await ctx.respond(f'*{ctx.author.display_name} is filling {target.display_name}*')
 
 	async def unfill(self, 
-		ctx : ApplicationContext,
+		ctx,
 		target : Option(
 			discord.Member,
 			"The target to fill up.",
@@ -102,7 +103,7 @@ class Simple_Reactions:
 			await ctx.respond(f'*{ctx.author.display_name} is unfilling {target.display_name}*')
 
 	async def kiss(self, 
-		ctx : ApplicationContext,
+		ctx,
 		target : Option(
 			discord.Member,
 			"The target to kiss.",
@@ -117,7 +118,7 @@ class Simple_Reactions:
 			await ctx.respond(f'*{ctx.author.display_name} kisses {target.display_name}*')
 
 	async def welcome(self, 
-		ctx : ApplicationContext,
+		ctx,
 		target : Option(
 			discord.Member,
 			"The user to welcome.",
@@ -132,7 +133,7 @@ class Simple_Reactions:
 			await ctx.respond(f'{ctx.author.display_name}: Welcome, {target.display_name} to T1T4N1UM Project!')
 
 	async def bang(self, 
-		ctx : ApplicationContext,
+		ctx,
 		target : Option(
 			discord.Member,
 			"The person to bang.",
@@ -147,7 +148,7 @@ class Simple_Reactions:
 			await ctx.respond(f'*{ctx.author.display_name} bangs {target.display_name}*')
 
 	async def hug(self, 
-		ctx : ApplicationContext,
+		ctx,
 		target : Option(
 			discord.Member,
 			"The person to hug.",
@@ -162,7 +163,7 @@ class Simple_Reactions:
 			await ctx.respond(f'*{ctx.author.display_name} hugs {target.display_name}*')
 
 	async def kick(self, 
-		ctx : ApplicationContext,
+		ctx,
 		target : Option(
 			discord.Member,
 			"The person to kick.",
@@ -177,7 +178,7 @@ class Simple_Reactions:
 			await ctx.respond(f'*{ctx.author.display_name} kicks {target.display_name}*')
 
 	async def punch(self, 
-		ctx : ApplicationContext,
+		ctx,
 		target : Option(
 			discord.Member,
 			"The person to punch.",
@@ -192,7 +193,7 @@ class Simple_Reactions:
 			await ctx.respond(f'*{ctx.author.display_name} punch {target.display_name} in the face!*')
 
 	async def cry(self, 
-		ctx : ApplicationContext,
+		ctx,
 		target : Option(
 			discord.Member,
 			"The person who made you cry.",
@@ -210,7 +211,7 @@ class Simple_Reactions:
 				await ctx.respond(f'*{ctx.author.display_name} is crying because of {target.display_name}!*')
 
 	async def lick(self, 
-		ctx : ApplicationContext,
+		ctx,
 		target : Option(
 			discord.Member,
 			"The person you want to lick.",
@@ -225,7 +226,7 @@ class Simple_Reactions:
 			await ctx.respond(f'*{ctx.author.display_name} licks {target.display_name}!*')
 
 	async def suck(self, 
-		ctx : ApplicationContext,
+		ctx,
 		target : Option(
 			discord.Member,
 			"The person you want to suck.",
@@ -240,7 +241,7 @@ class Simple_Reactions:
 			await ctx.respond(f'*{ctx.author.display_name} sucks {target.display_name}!*')
 
 	async def cum(self, 
-		ctx : ApplicationContext,
+		ctx,
 		target : Option(
 			discord.Member,
 			"The person you want to cum on.",
@@ -255,7 +256,7 @@ class Simple_Reactions:
 			await ctx.respond(f'*{ctx.author.display_name} cums in {target.display_name}!*')
 
 	async def dodge(self, 
-		ctx : ApplicationContext,
+		ctx,
 		target : Option(
 			discord.Member,
 			"The person you want to dodge.",
@@ -270,14 +271,14 @@ class Simple_Reactions:
 			await ctx.respond(f'*{ctx.author.display_name} dodges {target.display_name}!*')
 
 	async def heal(self, 
-		ctx : ApplicationContext,
+		ctx,
 		target : Option(
 			discord.Member,
 			"The person you want to heal.",
 			name='target',
 			default=None)=None
 		):
-		"Cum (in someone)"
+		"Heals (someone)"
 
 		if target is None or target.id == ctx.author.id:
 			await ctx.respond(f'*{ctx.author.display_name} heals*')
@@ -285,7 +286,7 @@ class Simple_Reactions:
 			await ctx.respond(f'*{ctx.author.display_name} heals {target.display_name}!*')
 
 	async def fart(self, 
-		ctx : ApplicationContext,
+		ctx,
 		target : Option(
 			discord.Member,
 			"The person you want to cum on.",
@@ -300,7 +301,7 @@ class Simple_Reactions:
 			await ctx.respond(f'*{ctx.author.display_name} farts on {target.display_name}!*')
 
 	async def win(self, 
-		ctx : ApplicationContext,
+		ctx,
 		target : Option(
 			discord.Member,
 			"The person you have beaten.",
@@ -315,7 +316,7 @@ class Simple_Reactions:
 			await ctx.respond(f'*{ctx.author.display_name} won against {target.display_name}!*')
 
 	async def lost(self, 
-		ctx : ApplicationContext,
+		ctx,
 		target : Option(
 			discord.Member,
 			"The person you lost to.",
@@ -330,7 +331,7 @@ class Simple_Reactions:
 			await ctx.respond(f'*{ctx.author.display_name} lost against {target.display_name}!*')
 
 	async def pan(self, 
-		ctx : ApplicationContext,
+		ctx,
 		target : Option(
 			discord.Member,
 			"The person you want to throw the pan to.",
@@ -347,7 +348,7 @@ class Simple_Reactions:
 			await ctx.respond(f'*{ctx.author.display_name} threw a pan at {target.display_name}!*')
 
 	async def laugh(self, 
-		ctx : ApplicationContext,
+		ctx,
 		target : Option(
 			discord.Member,
 			"The person you laugh at.",
@@ -361,6 +362,20 @@ class Simple_Reactions:
 		else:
 			await ctx.respond(f'*{ctx.author.display_name} is laughing at {target.display_name}!*')
 
+	async def leave(self, 
+		ctx,
+		target : Option(
+			str,
+			"What do you want to leave?",
+			name='target',
+			default=None)=None
+		):
+		"Leaves (something)"
+
+		if target is None:
+			await ctx.respond(f'*{ctx.author.display_name} left the server!*')
+		else:
+			await ctx.respond(f'*{ctx.author.display_name} left {target}!*')
 
 
 module_class = Simple_Reactions

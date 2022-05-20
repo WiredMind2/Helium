@@ -1,7 +1,6 @@
 #Discord_bot.py translate module
 
 import discord
-from discord.commands.context import ApplicationContext
 from discord.commands import Option
 import logging
 logger = logging.getLogger('helium_logger')
@@ -23,7 +22,7 @@ class Translate:
 		return txt_cmds
 
 	async def translate(self, 
-		ctx : ApplicationContext,
+		ctx,
 		txt : Option(
 			str,
 			"The text you want to translate",
@@ -32,7 +31,7 @@ class Translate:
 		):
 		"Translate a message or a text:\n > .uh J'aime les pâtes!"
 
-		msg = ctx.interaction.message
+		msg = ctx.message
 		if txt != "":
 			orig = txt
 		elif msg.reference is not None and msg.reference.resolved is not None and hasattr(msg.reference.resolved, 'content') and msg.reference.resolved.content is not None:

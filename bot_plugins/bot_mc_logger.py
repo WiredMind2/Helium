@@ -1,7 +1,7 @@
 #Discord_bot.py mc logger module
 
 import discord
-from discord import ApplicationContext, Option
+from discord import Option
 
 import socket
 import json
@@ -13,7 +13,7 @@ import multiprocessing
 logger = logging.getLogger('helium_logger')
 
 class Minecraft:
-	"""Minecraft logger: mc"""
+	"""(Admin) Minecraft logger: mc"""
 	def initialize(self):
 		txt_cmds = {
 			self.start_mc_log: ['start_mc_log'],
@@ -26,6 +26,7 @@ class Minecraft:
 		}
 
 		self.sock_addr = ('localhost', 14444)
+		self.start_mc_bot = False
 
 		if not hasattr(self, 'mc_log_channel'):
 			self.mc_log_channel = None
@@ -33,6 +34,8 @@ class Minecraft:
 		return txt_cmds, events
 	
 	async def mc_log_autoconnect(self):
+		if not self.start_mc_bot:
+			return
 		if self.mc_log_channel is not None:
 			try:
 				channel = await self.fetch_channel(self.mc_log_channel)
@@ -43,6 +46,8 @@ class Minecraft:
 				self.start_remote_process(webhook.url)
 
 	async def log_msg(self, msg):
+		if not self.start_mc_bot:
+			return
 		if self.mc_log_channel is None or msg.channel.id != self.mc_log_channel:
 			return
 
@@ -84,11 +89,11 @@ class Minecraft:
 				sock.close()
 	
 	async def start_mc_log(self, 
-		ctx : ApplicationContext
+		ctx
 		):
 		"Starts the minecraft logger (admin only)"
 
-		if ctx.author.id != self.admin:
+		if not self.is_admin(ctx.author):
 			await ctx.respond('This is an admin only command!')
 			return
 		
@@ -115,11 +120,11 @@ class Minecraft:
 			sock.close()
 
 	async def stop_mc_log(self, 
-		ctx : ApplicationContext
+		ctx
 		):
 		"Stops the minecraft logger (admin only)"
 
-		if ctx.author.id != self.admin:
+		if not self.is_admin(ctx.author):
 			await ctx.respond('This is an admin only command!')
 			return
 

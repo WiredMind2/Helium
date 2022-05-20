@@ -3,7 +3,7 @@ import importlib
 import logging
 logger = logging.getLogger('helium_logger')
 
-def import_plugins():
+def import_plugins(reload=False):
 	if __package__ is None:
 		return
 	cwd = os.path.dirname(__file__)
@@ -16,7 +16,8 @@ def import_plugins():
 			except ImportError as e:
 				logger.warn('Error', e)
 			else:
-				plugins.append(m.module_class)
+				if hasattr(m, 'module_class'):
+					plugins.append(m.module_class)
 	return plugins
 
 plugins = import_plugins()

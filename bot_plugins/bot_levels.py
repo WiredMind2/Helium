@@ -5,12 +5,13 @@ import logging
 logger = logging.getLogger('helium_logger')
 
 import discord
-from discord import ApplicationContext, Option
+from discord import Option
 
 import random
 from datetime import datetime
 
 class Levels:
+	"""(Admin) Levels: levels"""
 	def initialize(self):
 		txt_cmds = {
 			self.add_xp: ['xp', 'give_xp', 'add_xp'],
@@ -50,7 +51,7 @@ class Levels:
 				self.user_levels[author_id] = xp
 
 	async def add_xp(self, 
-		ctx : ApplicationContext,
+		ctx,
 		target : Option(
 			discord.Member,
 			"The member to give xp to",
@@ -62,8 +63,9 @@ class Levels:
 		):
 		"Gives xp to a member (negative amount to remove)"
 
-		if ctx.author.id != self.admin:
+		if not self.is_admin(ctx.author):
 			await ctx.respond('This command is for admins only!')
+			return
 
 		if target.id in self.user_levels:
 			self.user_levels[target.id] += amount
@@ -77,7 +79,7 @@ class Levels:
 			await ctx.respond(f"Xp of member '{target.display_name}' is now {self.user_levels[target.id]} xp")
 
 	async def reset_xp(self, 
-		ctx : ApplicationContext,
+		ctx,
 		target : Option(
 			discord.Member,
 			"The member to reset the xp",
@@ -85,7 +87,7 @@ class Levels:
 		):
 		"Reset the xp of a member"
 
-		if ctx.author.id != self.admin:
+		if not self.is_admin(ctx.author):
 			await ctx.respond('This command is for admins only!')
 			return
 

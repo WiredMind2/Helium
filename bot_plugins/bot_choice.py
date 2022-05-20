@@ -5,9 +5,10 @@ import logging
 logger = logging.getLogger('helium_logger')
 
 import discord
-from discord import ApplicationContext, Option
+from discord import Option
 
 class Reaction_Choice:
+	"""(Admin) Reaction choice: choice"""
 	def initialize(self):
 		txt_cmds = {
 			self.choice_create: ['choice_create', 'create_choice'],
@@ -27,7 +28,7 @@ class Reaction_Choice:
 		return txt_cmds, events
 
 	async def choice_create(self, 
-		ctx : ApplicationContext,
+		ctx,
 		title : Option(
 			str,
 			"The title",
@@ -43,7 +44,7 @@ class Reaction_Choice:
 		):
 		"Create a new reaction choice"
 
-		if ctx.author != self.admin:
+		if not self.is_admin(ctx.author):
 			ctx.respond('This command is for admins only!')
 			return
 
@@ -77,7 +78,7 @@ class Reaction_Choice:
 		self.choices_data[m_id] = data
 
 	async def choice_modify(self, 
-		ctx : ApplicationContext,
+		ctx,
 		title : Option(
 			str,
 			"The title of the choice to modify",
@@ -95,7 +96,7 @@ class Reaction_Choice:
 		):
 		"Modify a reaction choice"
 
-		if ctx.author != self.admin:
+		if not self.is_admin(ctx.author):
 			ctx.respond('This command is for admins only!')
 			return
 
@@ -129,7 +130,7 @@ class Reaction_Choice:
 		self.choices_data[data['id']] = data
 
 	async def choice_add_reaction(self, 
-		ctx : ApplicationContext,
+		ctx,
 		title : Option(
 			str,
 			"The title of the choice to modify",
@@ -150,7 +151,7 @@ class Reaction_Choice:
 		):
 		"Add a reaction to a reaction choice"
 
-		if ctx.author != self.admin:
+		if not self.is_admin(ctx.author):
 			ctx.respond('This command is for admins only!')
 			return
 
@@ -181,7 +182,7 @@ class Reaction_Choice:
 		self.choices_data[m_id] = data
 
 	async def choice_remove_reaction(self, 
-		ctx : ApplicationContext,
+		ctx,
 		title : Option(
 			str,
 			"The title of the choice to modify",
@@ -193,7 +194,7 @@ class Reaction_Choice:
 		):
 		"Remove a reaction to a reaction choice"
 
-		if ctx.author != self.admin:
+		if not self.is_admin(ctx.author):
 			ctx.respond('This command is for admins only!')
 			return
 
@@ -220,7 +221,7 @@ class Reaction_Choice:
 			return
 
 	async def choice_delete(self, 
-		ctx : ApplicationContext,
+		ctx,
 		title : Option(
 			str,
 			"The title of the choice to delete",
@@ -228,7 +229,7 @@ class Reaction_Choice:
 		):
 		"Delete a reaction choice"
 
-		if ctx.author != self.admin:
+		if not self.is_admin(ctx.author):
 			ctx.respond('This command is for admins only!')
 			return
 
