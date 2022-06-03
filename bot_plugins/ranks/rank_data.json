@@ -1,0 +1,418 @@
+[{
+        "name": "Command Block",
+        "rank": 30,
+        "lvl": 76,
+        "perms": [
+            "manage_events",
+            "start_embedded_activities"
+        ],
+        "role_id": null,
+        "color": null,
+        "icon_css": "icon-minecraft-command-block"
+    },
+    {
+        "name": "Warden",
+        "rank": 29,
+        "lvl": 74,
+        "perms": null,
+        "role_id": 977260499320324176,
+        "color": [
+            10,
+            29,
+            100
+        ],
+        "icon_css": "icon-minecraft-mob-warden-face"
+    },
+    {
+        "name": "Wither",
+        "rank": 28,
+        "lvl": 72,
+        "perms": null,
+        "role_id": 977260329027375214,
+        "color": [
+            31,
+            31,
+            31
+        ],
+        "icon_css": "icon-minecraft-mob-wither-face"
+    },
+    {
+        "name": "Ender Dragon",
+        "rank": 27,
+        "lvl": 70,
+        "perms": null,
+        "role_id": 977260419502731295,
+        "color": [
+            3,
+            0,
+            0
+        ],
+        "icon_css": "icon-minecraft-mob-ender-dragon-face"
+    },
+    {
+        "name": "Shulker",
+        "rank": 26,
+        "lvl": 68,
+        "perms": null,
+        "role_id": 977260008305737809,
+        "color": [
+            178,
+            96,
+            178
+        ],
+        "icon_css": "icon-minecraft-mob-shulker-face"
+    },
+    {
+        "name": "Enderman",
+        "rank": 25,
+        "lvl": 66,
+        "perms": [
+            "manage_threads",
+            "priority_speaker"
+        ],
+        "role_id": 977259295278264370,
+        "color": [
+            24,
+            1,
+            36
+        ],
+        "icon_css": "icon-minecraft-mob-enderman-face"
+    },
+    {
+        "name": "Wither Skeleton",
+        "rank": 24,
+        "lvl": 64,
+        "perms": null,
+        "role_id": 977259286352756746,
+        "color": [
+            56,
+            55,
+            55
+        ],
+        "icon_css": "icon-minecraft-mob-wither-skeleton-face"
+    },
+    {
+        "name": "Ghast",
+        "rank": 23,
+        "lvl": 62,
+        "perms": [
+            "deafen_members",
+            "move_members"
+        ],
+        "role_id": 977259281009246298,
+        "color": [
+            255,
+            255,
+            255
+        ],
+        "icon_css": "icon-minecraft-mob-ghast-face"
+    },
+    {
+        "name": "Blaze",
+        "rank": 22,
+        "lvl": 60,
+        "perms": null,
+        "role_id": 977259276596805632,
+        "color": [
+            255,
+            180,
+            0
+        ],
+        "icon_css": "icon-minecraft-mob-blaze-face"
+    },
+    {
+        "name": "Magma Cube",
+        "rank": 21,
+        "lvl": 58,
+        "perms": null,
+        "role_id": 977259290794537050,
+        "color": [
+            131,
+            45,
+            8
+        ],
+        "icon_css": "icon-minecraft-mob-magma-cube-face"
+    },
+    {
+        "name": "Piglin",
+        "rank": 20,
+        "lvl": 55,
+        "perms": [
+            "manage_messages",
+            "manage_emojis",
+            "mute_members"
+        ],
+        "role_id": 977259272033407037,
+        "color": [
+            153,
+            92,
+            71
+        ],
+        "icon_css": "icon-minecraft-mob-piglin-face"
+    },
+    {
+        "name": "Guardian",
+        "rank": 19,
+        "lvl": 52,
+        "perms": null,
+        "role_id": 977259267482599494,
+        "color": [
+            182,
+            98,
+            38
+        ],
+        "icon_css": "icon-minecraft-mob-guardian-face"
+    },
+    {
+        "name": "Phantom",
+        "rank": 18,
+        "lvl": 48,
+        "perms": null,
+        "role_id": 977259179137957951,
+        "color": [
+            4,
+            0,
+            73
+        ],
+        "icon_css": "icon-minecraft-mob-phantom-face"
+    },
+    {
+        "name": "Creeper",
+        "rank": 17,
+        "lvl": 44,
+        "perms": null,
+        "role_id": 977259004193562656,
+        "color": [
+            56,
+            255,
+            57
+        ],
+        "icon_css": "icon-minecraft-mob-creeper-face"
+    },
+    {
+        "name": "Skeleton",
+        "rank": 16,
+        "lvl": 40,
+        "perms": null,
+        "role_id": 977258836865990716,
+        "color": [
+            193,
+            197,
+            197
+        ],
+        "icon_css": "icon-minecraft-mob-skeleton-face"
+    },
+    {
+        "name": "Zombie",
+        "rank": 15,
+        "lvl": 37,
+        "perms": [
+            "create_private_threads",
+            "create_public_threads",
+            "manage_nicknames"
+        ],
+        "role_id": 977258724160856136,
+        "color": [
+            14,
+            56,
+            0
+        ],
+        "icon_css": "icon-minecraft-mob-zombie-face"
+    },
+    {
+        "name": "Ender Egg",
+        "rank": 14,
+        "lvl": 34,
+        "perms": null,
+        "role_id": 974231330705534996,
+        "color": [
+            113,
+            54,
+            138
+        ],
+        "icon_css": "icon-minecraft-dragon-egg"
+    },
+    {
+        "name": "Beacon",
+        "rank": 13,
+        "lvl": 31,
+        "perms": null,
+        "role_id": 974231044209385502,
+        "color": [
+            52,
+            152,
+            219
+        ],
+        "icon_css": "icon-minecraft-beacon"
+    },
+    {
+        "name": "Nether Star",
+        "rank": 12,
+        "lvl": 29,
+        "perms": null,
+        "role_id": 976014698971529228,
+        "color": [
+            226,
+            203,
+            91
+        ],
+        "icon_css": "icon-minecraft-nether-star"
+    },
+    {
+        "name": "Emerald",
+        "rank": 11,
+        "lvl": 26,
+        "perms": null,
+        "role_id": 839779416326537237,
+        "color": [
+            31,
+            139,
+            76
+        ],
+        "icon_css": "icon-minecraft-emerald"
+    },
+    {
+        "name": "Netherite",
+        "rank": 10,
+        "lvl": 23,
+        "perms": [
+            "change_nickname",
+            "send_tts_messages"
+        ],
+        "role_id": 878564206025248788,
+        "color": [
+            68,
+            16,
+            23
+        ],
+        "icon_css": "icon-minecraft-netherite-ingot"
+    },
+    {
+        "name": "Diamond",
+        "rank": 9,
+        "lvl": 20,
+        "perms": null,
+        "role_id": 839779276924649472,
+        "color": [
+            26,
+            188,
+            156
+        ],
+        "icon_css": "icon-minecraft-diamond"
+    },
+    {
+        "name": "Amethyst",
+        "rank": 8,
+        "lvl": 18,
+        "perms": null,
+        "role_id": 974004158355079228,
+        "color": [
+            155,
+            89,
+            182
+        ],
+        "icon_css": "icon-minecraft-amethyst-cluster"
+    },
+    {
+        "name": "Gold",
+        "rank": 7,
+        "lvl": 15,
+        "perms": null,
+        "role_id": 839771240066580500,
+        "color": [
+            241,
+            196,
+            15
+        ],
+        "icon_css": "icon-minecraft-gold-ingot"
+    },
+    {
+        "name": "Redstone",
+        "rank": 6,
+        "lvl": 13,
+        "perms": null,
+        "role_id": 839771165144121364,
+        "color": [
+            158,
+            0,
+            0
+        ],
+        "icon_css": "icon-minecraft-redstone"
+    },
+    {
+        "name": "Lapis",
+        "rank": 5,
+        "lvl": 10,
+        "perms": [
+            "attach_files",
+            "external_stickers",
+            "request_to_speak"
+        ],
+        "role_id": 839771065366347777,
+        "color": [
+            0,
+            2,
+            134
+        ],
+        "icon_css": "icon-minecraft-lapis-lazuli"
+    },
+    {
+        "name": "Iron",
+        "rank": 4,
+        "lvl": 8,
+        "perms": null,
+        "role_id": 839771007656001546,
+        "color": [
+            96,
+            125,
+            139
+        ],
+        "icon_css": "icon-minecraft-iron-ingot"
+    },
+    {
+        "name": "Copper",
+        "rank": 3,
+        "lvl": 5,
+        "perms": [
+            "add_reactions",
+            "create_instant_invite",
+            "embed_links",
+            "read_message_history",
+            "stream",
+            "use_slash_commands"
+        ],
+        "role_id": 917778148798648321,
+        "color": [
+            168,
+            67,
+            0
+        ],
+        "icon_css": "icon-minecraft-copper-ingot"
+    },
+    {
+        "name": "Coal",
+        "rank": 2,
+        "lvl": 3,
+        "perms": null,
+        "role_id": 839770919039402004,
+        "color": [
+            36,
+            36,
+            36
+        ],
+        "icon_css": "icon-minecraft-coal"
+    },
+    {
+        "name": "Dirt",
+        "rank": 1,
+        "lvl": 0,
+        "perms": null,
+        "role_id": 917774707049254982,
+        "color": [
+            80,
+            25,
+            1
+        ],
+        "icon_css": "icon-minecraft-dirt"
+    }
+]

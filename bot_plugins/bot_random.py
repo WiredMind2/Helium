@@ -13,7 +13,7 @@ class Random:
 	"""Random: rand"""
 	def initialize(self):
 		txt_cmds = {
-			self.fight: ['battle', 'clash', 'fight', 'versus'],
+			self.fight: ['fight', 'battle', 'clash', 'versus'],
 			self.choose: ['choose', 'which'],
 			self.dice: ['dice', 'random'],
 			self.kill: ['kill'],
@@ -213,12 +213,13 @@ class Random:
 
 		await ctx.respond(embeds=game_embeds)
 
+	@discord.option(
+		'target',
+		description='The target to kill'
+	)
 	async def kill(self, 
 		ctx,
-		target : Option(
-			discord.Member,
-			"The target to kill",
-			name="target"),
+		target : discord.Member
 		):
 		"Try to kill someone, but you might get killed yourself!: \n > .kill @user"
 

@@ -101,12 +101,17 @@ class Misc:
 			content = content.replace(txt, rep)
 
 		pre = ''
+		responded = False
 
 		for i in range(amount):
 			if log_count:
 				pre = f'{i+1}: '
 			try:
-				await ctx.send(f'{pre}{content}')
+				if not responded:
+					await ctx.respond(f'{pre}{content}')
+					responded = True
+				else:
+					await ctx.send(f'{pre}{content}')
 			except Exception as e:
 				logger.warn(f'Error while spamming (iter n{i+1}): {e}')
 			await asyncio.sleep(delay)

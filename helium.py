@@ -32,8 +32,10 @@ class Bot(bridge.Bot, bot_events.Bot_Events, *bot_plugins.plugins):
 
 		# Main bot instance
 		intents = discord.Intents().all()
+		help_command = self.help
 		# TODO - owner_id
-		bridge.Bot.__init__(self, intents=intents, command_prefix=prefix)
+		bridge.Bot.__init__(self, intents=intents, command_prefix=prefix, help_command=None)
+		self.help = self.help_cmd
 
 		# Plugins:
 		self.load_plugins()
@@ -61,7 +63,7 @@ class Bot(bridge.Bot, bot_events.Bot_Events, *bot_plugins.plugins):
 			try:
 				data = p.initialize(self)
 			except Exception as e:
-				logger.warn(f'Error while importing {p}: {e}')
+				logger.warning(f'Error while importing {p}: {e}')
 
 			if isinstance(data, dict):
 				p_txt_cmds, events = data, None
@@ -73,22 +75,28 @@ class Bot(bridge.Bot, bot_events.Bot_Events, *bot_plugins.plugins):
 			if not plug_name.startswith('(Admin)'):
 				# parent = p.__doc__.split(': ')[0] # TODO - Command groups?
 				for cmd, keys in list(p_txt_cmds.items()):
+					doc = cmd.__doc__ or 'No description'
+					brief = doc.split(':')[0]
+					kwargs = {
+						'name': keys[0],
+						'aliases': keys[1:],
+						# 'parent': parent,
+						'help': brief,
+						'brief': brief,
+						'description': brief
+					}
 					if cmd.__doc__ is not None and '(admin only!)' not in cmd.__doc__:
-						doc = cmd.__doc__ or 'No description'
-						brief = doc.split(':')[0]
-						kwargs = {
-							'name': keys[0],
-							'aliases': keys[1:],
-							# 'parent': parent,
-							'help': brief,
-							'brief': brief,
-							'description': brief
-						}
 						cmd = bridge.BridgeCommand(cmd, **kwargs)
 						try:
 							self.add_bridge_command(cmd)
 						except Exception as e:
-							print(kwargs, type(e), e)
+							logger.warn('Error while registering bridge command:', kwargs, type(e), e)
+					else:
+						cmd = commands.Command(cmd, **kwargs)
+						try:
+							self.add_command(cmd)
+						except Exception as e:
+							logger.warn('Error while registering prefix command:', kwargs, type(e), e)
 
 				self.txt_cmds |= p_txt_cmds
 
@@ -109,7 +117,7 @@ class Bot(bridge.Bot, bot_events.Bot_Events, *bot_plugins.plugins):
 		return await super().get_context(message, cls=cls)
 
 	def is_admin(self, member):
-		if member.id == member.guild.owner_id: # Member is guild owner
+		if isinstance(member, discord.Member) and member.id == member.guild.owner_id: # Member is guild owner
 			return True
 
 		role_count = len(member.guild.roles)

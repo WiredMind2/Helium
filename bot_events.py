@@ -38,7 +38,6 @@ else:
 		def decorator(func): # Actual decorator (@)
 			def inner(self, *args, **kwargs): # Actual processing
 				coros = []
-				print(name, self.events.get(name, []))
 				
 				for event in self.events.get(name, []):
 					f = event(*args, **kwargs)
@@ -65,11 +64,29 @@ class Bot_Events:
 
 	@event('on_message')
 	async def on_message_wrapper(self, msg):
-		await self.on_message_evt(msg)
+		running = await self.on_message_evt(msg)
+		if running is False:
+			return
 		await self.process_commands(msg)
 
 	async def on_message_evt(self, msg): #'_evt' to prevent override
-		if self.user == msg.author or msg.author.bot:
+		if self.user == msg.author:
+			return
+
+		if msg.author.bot:
+			lvlup_msg = {
+				'channel': 920004139864453120,
+				'author': 159985870458322944,
+				'regex': 'GG <@(\d+)>, you just advanced to level 36!'
+			}
+			if msg.author.id == lvlup_msg['author'] and msg.channel.id == lvlup_msg['channel']:
+				match = re.findall(lvlup_msg['regex'], msg.content)
+				if match:
+					member = msg.guild.get_member(match[0])
+					if member is not None:
+						await self.update_single_role(msg, member)
+			else:
+				print('MEE6 lvl up?', msg.author.id, lvlup_msg['author'], msg.channel.id, lvlup_msg['channel'])
 			return
 
 		if len(msg.embeds) > 0:
@@ -82,10 +99,18 @@ class Bot_Events:
 				logger.info(f'Unbanned {msg.author.display_name} - time\'s up!')
 				del self.banned_list[msg.author.id]
 			else:
-				if msg.type == discord.MessageType.default:
+				# chat_input_command = application_command -> slash commands ?
+				# thread_created -> thread created from old msgs ?
+				if msg.type in (
+					discord.MessageType.default, 
+					discord.MessageType.reply,
+					discord.MessageType.application_command
+					):
 					await msg.delete()
 					logger.info(f'DELETED - {msg.author.display_name}: {msg.content}')
-					return
+					return False
+				else:
+					logger.log('Unknown message type:', msg.type)
 
 		# if msg.content.startswith(self.prefix) and msg.content != self.prefix:
 		# 	await self.on_message_cmds(msg)

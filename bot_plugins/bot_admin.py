@@ -1,6 +1,7 @@
 #Discord_bot.py admin module
 
 import discord
+from discord.ext import commands
 from discord.commands.options import Option
 
 import asyncio
@@ -33,21 +34,23 @@ class Admin:
 
 		return txt_cmds
 
+	@discord.option(
+		"user",
+		description="The user to ban"
+	)
+	@discord.option(
+		"delay",
+		description="The delay before unbanning (5sec/2h/5days/...)"
+	)
+	@discord.option(
+		"reason",
+		description="The reason for this ban"
+	)
 	async def block(self, 
 		ctx,
-		user : Option(
-			discord.Member,
-			"The user to ban",
-			name="user"),
-		delay : Option(
-			str,
-			"The delay before unbanning (5sec/2h/5days/...)",
-			name="delay"),
-		reason : Option(
-			str,
-			"The reason for this ban",
-			name="reason",
-			default=None)=None
+		user : discord.Member,
+		delay : str,
+		reason : str = None
 		):
 		"Mute someone:\n > .ban @user (5sec/2h/5days/...)"
 
@@ -61,12 +64,19 @@ class Admin:
 				await ctx.respond(f'{delay} has not been recognized as a valid delay!')
 				return
 		else:
-			# Shouldn't happen
+			# Shouldn't happen anymore
 			await ctx.respond('You must specify a delay!')
 			return
 			amount, unit, length = None, None, None
 
-		print(ctx.author, user, delay)
+		if not isinstance(user, discord.Member):
+			if isinstance(user, discord.User):
+				user = ctx.guild.get_member(user.id)
+
+			if not isinstance(user, discord.Member):
+				await ctx.respond('Member not found!')
+				return
+
 		if not self.is_admin(ctx.author) and ctx.author.top_role.position < user.top_role.position:
 			await ctx.respond(f'You can\'t ban someone with a higher rank than you!')
 			return
@@ -166,7 +176,14 @@ class Admin:
 		):
 		"Unban someone:\n > .unban @user"
 
-		# TODO - broken lmao
+		if not isinstance(user, discord.Member):
+			if isinstance(user, discord.User):
+				user = ctx.guild.get_member(user.id)
+
+			if not isinstance(user, discord.Member):
+				await ctx.respond('Member not found!')
+				return
+
 		if not self.is_admin(ctx.author) and ctx.author.top_role.position < user.top_role.position:
 			await ctx.respond(f'You can\'t unban someone with a higher rank than you!')
 			return
