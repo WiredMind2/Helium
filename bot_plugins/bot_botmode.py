@@ -12,7 +12,7 @@ class Bot_mode:
 	def initialize(self):
 		txt_cmds = {
 			self.set_bot_mode: ['bot', 'botmode', 'set_bot', 'set_botmode'],
-			self.swap_user: ['ghost', 'imitate', 'swap'],
+			self.swap_user: ['ghost', 'swap', 'imitate'],
 		}
 
 		events = {
@@ -86,6 +86,7 @@ class Bot_mode:
 		if ctx.channel.id not in self.bot_mode:
 			await ctx.respond('You must activate bot mode first!')
 			return
+
 		if ctx.author.bot:
 			if ctx.message is not None:
 				try:
@@ -94,7 +95,8 @@ class Bot_mode:
 					pass
 
 		if user is None:
-			del self.swaped_users[ctx.author.id]
+			if ctx.author.id in self.swaped_users:
+				del self.swaped_users[ctx.author.id]
 			return
 
 		self.swaped_users[ctx.author.id] = user

@@ -10,7 +10,7 @@ class Relations:
 	def initialize(self):
 		txt_cmds = {
 			self.marry: ['marry'],
-			self.married: ['married', 'marriedlist'],
+			self.married: ['married', 'marriedlist', 'relations'],
 			self.dump: ['dump', 'divorce'],
 			self.marry_all: ['marry_all'],
 			self.adopt: ['adopt'],
@@ -184,7 +184,7 @@ class Relations:
 		if author_id == user_id:
 			await ctx.respond(f"You can't dump yourself!")
 
-		if user_id in self.married_users[author_id]:
+		if user_id in self.married_users.get(author_id, []):
 			self.married_users[author_id].remove(user_id)
 			self.married_users[user_id].remove(author_id)
 
@@ -205,6 +205,7 @@ class Relations:
 
 		if not self.is_admin(ctx.author):
 			await ctx.respond('Only the bot\'s admin can use this command!')
+			return
 
 		self.marry_requests = {int(k):v for k,v in self.marry_requests.items()} # Json can't convert keys back to int ?
 		self.married_users = {int(k):v for k,v in self.married_users.items()}
@@ -396,14 +397,13 @@ class Relations:
 		user : Option(
 			discord.Member,
 			"The child you want to emancipate",
-			name="dumped",
+			name="child",
 			required=True),
 		):
 		"Wanna get rid of your children?"
 
 		parent = ctx.author
 		parent_id = parent.id
-		child = user
 		child_id = user.id
 
 		self.adopted_users = {int(k):v for k,v in self.adopted_users.items()}

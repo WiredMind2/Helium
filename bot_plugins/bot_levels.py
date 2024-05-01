@@ -1,6 +1,5 @@
 #Discord_bot.py reaction_choice module
 
-import asyncio
 import logging
 logger = logging.getLogger('helium_logger')
 

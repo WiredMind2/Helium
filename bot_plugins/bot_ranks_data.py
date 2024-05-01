@@ -9,99 +9,10 @@ import os
 import re
 from PIL import Image
 
+if 'GUILDS_ROLE_DATA' not in globals():
+	globals()['GUILDS_ROLE_DATA'] = {}
 
 class Role_Data:
-	perms = {
-		0: [ # Dirt
-			'connect',
-			'external_emojis',
-			'read_messages',
-			'send_messages',
-			'speak',
-			'send_messages_in_threads',
-			'use_voice_activation',
-			'view_channel'
-		],
-		3: [ # Coal
-			'add_reactions',
-			'create_instant_invite',
-			'embed_links',
-			'read_message_history',
-			'stream',
-			'use_slash_commands'
-		],
-		5: [ # Copper
-			'attach_files',
-			'external_stickers',
-			'request_to_speak'
-		],
-		10: [ # Iron
-			'change_nickname',
-			'send_tts_messages'
-		],
-		15: [ # Lapis
-			'create_private_threads',
-			'create_public_threads',
-			'manage_nicknames'
-		],
-		20: [ # Redstone
-			'manage_messages',
-			'manage_emojis',
-			# 'moderate_members',
-			'mute_members'
-		],
-		23: [ # Gold
-			'deafen_members',
-			'move_members'
-		],
-		25: [ # Amethyst
-			'manage_threads',
-			'priority_speaker'
-		],
-		30: [ # Diamond
-			'manage_events',
-			'start_embedded_activities'
-		],
-		35: [ # Netherite
-			'manage_roles',
-			'manage_webhooks',
-			'view_audit_log'
-		],
-	}
-
-	ranks = {
-        30: 125, # command block
-        29: 120, # warden
-        28: 115, # wither
-        27: 110, # ender dragon
-        26: 105, # shulker
-        25: 100, # enderman
-        24: 95, # wither skeleton
-        23: 90, # ghast
-        22: 85, # blaze
-        21: 80, # magma cube
-        20: 75, # piglin
-        19: 70, # guardian
-        18: 65, # phantom
-        17: 60, # creeper
-        16: 55, # skeleton
-        15: 50, # zombie
-        14: 45, # ender egg
-        13: 40, # beacon
-        12: 35, # nether star
-        11: 30, # emerald
-        10: 25, # netherite
-        9: 20, # diamond
-        8: 18, # amethyst
-        7: 15, # gold
-        6: 13, # redstone
-        5: 10, # lapis
-        4: 8, # iron
-        3: 5, # copper
-        2: 3, # coal
-        1: 0 # dirt
-    }
-
 	@classmethod
 	def get_icon(cls, item, return_type='bytes'):
 		rgx = r'\n.ITEM_NAME{background-position:(-?\d+)(?:px)? (-?\d+)(?:px)?;}'
@@ -126,6 +37,74 @@ class Role_Data:
 				return img_str
 			elif return_type == "pil":
 				return img
+
+	def __init__(self, guild):
+		guild_id = guild.id
+		if guild_id in globals()['GUILDS_ROLE_DATA']:
+			self.__dict__ = globals()['GUILDS_ROLE_DATA'][guild_id].__dict__
+			return
+
+		self.guild = guild
+		self.guild_id = guild_id
+
+		self.get_rank_data()
+
+		globals()['GUILDS_ROLE_DATA'][guild_id] = self
+
+	def get_rank_data(self):
+		path = f'./bot_plugins/ranks/guilds/{self.guild_id}.json'
+		if os.path.exists(path):
+			with open(path, 'r') as f:
+				self.guild_rank_data = json.load(f)
+		else:
+			with open('./bot_plugins/ranks/rank_data.json', 'r') as f:
+				self.guild_rank_data = json.load(f)
+			self.save_rank_data()
+
+		self.guild_rank_data = sorted(self.guild_rank_data, reverse=True, key=lambda e: e['rank'])
+
+		self.ranks = {role['rank']: role['lvl'] for role in self.guild_rank_data}
+	
+		self.find_ranks_ids()
+		self.find_ranks_perms()
+
+	def save_rank_data(self):
+		path = f'./bot_plugins/ranks/guilds/{self.guild_id}.json'
+		with open(path, 'w') as f:
+			json.dump(self.guild_rank_data, f)
+
+	def modify_rank(self, name, data):
+		keys = ("lvl", "perms", "role_id", "color", "icon_css")
+		data = {k:v for k,v in data.items() if k in keys}
+
+		for i, rank in enumerate(self.guild_rank_data):
+			if rank['name'] == name:
+				rank = {k:data.get(k, v) for k,v in rank.items()}
+				self.guild_rank_data[i] = rank
+		
+		self.save_rank_data()
+
+	def find_ranks_ids(self):
+		name_by_id = {role['name']: role['rank'] for role in self.guild_rank_data}
+		self.ranks_ids = {}
+		for role in self.guild.roles:
+			if role.name in name_by_id:
+				self.ranks_ids[name_by_id[role.name]] = role.id
+
+	def find_ranks_perms(self):
+		self.perms = {}
+		current = set()
+		for role in reversed(self.guild_rank_data):
+			if role['perms'] is not None:
+				current.update(role['perms'])
+				self.perms[role['lvl']] = current
+
+	def get_role_perms(self, rank):
+		lvl = rank['lvl']
+		perms = [k for i in range(lvl+1) for k in self.perms.get(i, [])]
+		perms = set(perms)
+		return perms
+
 
 
 if __name__ == "__main__":

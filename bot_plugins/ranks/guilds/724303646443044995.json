@@ -15,7 +15,7 @@
         "rank": 29,
         "lvl": 74,
         "perms": null,
-        "role_id": null,
+        "role_id": 977260499320324176,
         "color": [
             10,
             29,
@@ -28,7 +28,7 @@
         "rank": 28,
         "lvl": 72,
         "perms": null,
-        "role_id": null,
+        "role_id": 977260329027375214,
         "color": [
             31,
             31,
@@ -41,7 +41,7 @@
         "rank": 27,
         "lvl": 70,
         "perms": null,
-        "role_id": null,
+        "role_id": 977260419502731295,
         "color": [
             3,
             0,
@@ -54,7 +54,7 @@
         "rank": 26,
         "lvl": 68,
         "perms": null,
-        "role_id": null,
+        "role_id": 977260008305737809,
         "color": [
             178,
             96,
@@ -70,7 +70,7 @@
             "manage_threads",
             "priority_speaker"
         ],
-        "role_id": null,
+        "role_id": 977259295278264370,
         "color": [
             24,
             1,
@@ -83,7 +83,7 @@
         "rank": 24,
         "lvl": 64,
         "perms": null,
-        "role_id": null,
+        "role_id": 977259286352756746,
         "color": [
             56,
             55,
@@ -99,7 +99,7 @@
             "deafen_members",
             "move_members"
         ],
-        "role_id": null,
+        "role_id": 977259281009246298,
         "color": [
             255,
             255,
@@ -112,7 +112,7 @@
         "rank": 22,
         "lvl": 60,
         "perms": null,
-        "role_id": null,
+        "role_id": 977259276596805632,
         "color": [
             255,
             180,
@@ -125,7 +125,7 @@
         "rank": 21,
         "lvl": 58,
         "perms": null,
-        "role_id": null,
+        "role_id": 977259290794537050,
         "color": [
             131,
             45,
@@ -142,7 +142,7 @@
             "manage_emojis",
             "mute_members"
         ],
-        "role_id": null,
+        "role_id": 977259272033407037,
         "color": [
             153,
             92,
@@ -155,7 +155,7 @@
         "rank": 19,
         "lvl": 52,
         "perms": null,
-        "role_id": null,
+        "role_id": 977259267482599494,
         "color": [
             182,
             98,
@@ -168,7 +168,7 @@
         "rank": 18,
         "lvl": 48,
         "perms": null,
-        "role_id": null,
+        "role_id": 977259179137957951,
         "color": [
             4,
             0,
@@ -181,7 +181,7 @@
         "rank": 17,
         "lvl": 44,
         "perms": null,
-        "role_id": null,
+        "role_id": 977259004193562656,
         "color": [
             56,
             255,
@@ -194,7 +194,7 @@
         "rank": 16,
         "lvl": 40,
         "perms": null,
-        "role_id": null,
+        "role_id": 977258836865990716,
         "color": [
             193,
             197,
@@ -211,7 +211,7 @@
             "create_public_threads",
             "manage_nicknames"
         ],
-        "role_id": null,
+        "role_id": 977258724160856136,
         "color": [
             14,
             56,
@@ -224,7 +224,7 @@
         "rank": 14,
         "lvl": 34,
         "perms": null,
-        "role_id": null,
+        "role_id": 974231330705534996,
         "color": [
             113,
             54,
@@ -237,7 +237,7 @@
         "rank": 13,
         "lvl": 31,
         "perms": null,
-        "role_id": null,
+        "role_id": 974231044209385502,
         "color": [
             52,
             152,
@@ -250,7 +250,7 @@
         "rank": 12,
         "lvl": 29,
         "perms": null,
-        "role_id": null,
+        "role_id": 976014698971529228,
         "color": [
             226,
             203,
@@ -263,7 +263,7 @@
         "rank": 11,
         "lvl": 26,
         "perms": null,
-        "role_id": null,
+        "role_id": 839779416326537237,
         "color": [
             31,
             139,
@@ -279,7 +279,7 @@
             "change_nickname",
             "send_tts_messages"
         ],
-        "role_id": null,
+        "role_id": 878564206025248788,
         "color": [
             68,
             16,
@@ -292,7 +292,7 @@
         "rank": 9,
         "lvl": 20,
         "perms": null,
-        "role_id": null,
+        "role_id": 839779276924649472,
         "color": [
             26,
             188,
@@ -305,7 +305,7 @@
         "rank": 8,
         "lvl": 18,
         "perms": null,
-        "role_id": null,
+        "role_id": 974004158355079228,
         "color": [
             155,
             89,
@@ -318,7 +318,7 @@
         "rank": 7,
         "lvl": 15,
         "perms": null,
-        "role_id": null,
+        "role_id": 839771240066580500,
         "color": [
             241,
             196,
@@ -331,7 +331,7 @@
         "rank": 6,
         "lvl": 13,
         "perms": null,
-        "role_id": null,
+        "role_id": 839771165144121364,
         "color": [
             158,
             0,
@@ -348,7 +348,7 @@
             "external_stickers",
             "request_to_speak"
         ],
-        "role_id": null,
+        "role_id": 839771065366347777,
         "color": [
             0,
             2,
@@ -361,7 +361,7 @@
         "rank": 4,
         "lvl": 8,
         "perms": null,
-        "role_id": null,
+        "role_id": 839771007656001546,
         "color": [
             96,
             125,
@@ -381,7 +381,7 @@
             "stream",
             "use_slash_commands"
         ],
-        "role_id": null,
+        "role_id": 917778148798648321,
         "color": [
             168,
             67,
@@ -394,7 +394,7 @@
         "rank": 2,
         "lvl": 3,
         "perms": null,
-        "role_id": null,
+        "role_id": 839770919039402004,
         "color": [
             36,
             36,
@@ -407,7 +407,7 @@
         "rank": 1,
         "lvl": 0,
         "perms": null,
-        "role_id": null,
+        "role_id": 917774707049254982,
         "color": [
             80,
             25,

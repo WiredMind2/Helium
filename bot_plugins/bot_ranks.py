@@ -7,9 +7,8 @@ import logging
 from math import sqrt
 
 import discord
-import requests
 from discord import Option
-from PIL import Image, ImageDraw, ImageFont, ImageOps
+from PIL import Image, ImageDraw, ImageFont
 
 try:
 	from .bot_ranks_data import Role_Data
@@ -29,6 +28,7 @@ class Role_Management():
 			self.roles: ['roles', 'ranks'],
 		}
 
+		# TODO - Use some kind of customisable server-specific database
 		self.ranks_ids = {
 			29: 977260499320324176, # warden
 			28: 977260329027375214, # wither
@@ -72,20 +72,15 @@ class Role_Management():
 		# 	default=False)=False,
 		):
 		"List all available ranks"
-
-		import json
 		
-		with open('./bot_plugins/ranks/rank_data.json') as f:
-			ranks = json.load(f)
-
-		ranks = sorted(ranks, key=lambda e: e['lvl'], reverse=True)
+		role_data = Role_Data(ctx.guild)
+		ranks = role_data.guild_rank_data
 
 		await ctx.defer()
 
 		imgs = []
 		for rank in ranks:
 			img = self.generate_role_img_row(rank)
-			# file = discord.File(img, filename=f"{rank['name']}.png")
 
 			imgs.append(img)
 
@@ -95,10 +90,11 @@ class Role_Management():
 				description = 'No roles have been registered yet!',
 				color = 0x0000FF
 			)
-			embed.set_footer(
-				text = 'Use .register_role to register a new role'
-			)
-			embed = discord.Embed.from_dict(embed)
+			# TODO
+			# embed.set_footer( 
+			# 	text = 'Use .register_role to register a new role'
+			# )
+
 			await ctx.respond(embed=embed)
 		else:
 			title_embed = discord.Embed(
@@ -127,7 +123,7 @@ class Role_Management():
 				if img is None:
 					break
 				row += 1
-			merged.show()
+			# merged.show()
 			
 			b = io.BytesIO()
 			merged.save(b, "PNG")
@@ -316,19 +312,20 @@ class Role_Management():
 	async def update_single_role(self, msg, member):
 		"NOT a bot command! - Called by on_message()"
 
+		await self.get_session()
+
 		url = f'https://mee6.xyz/api/plugins/levels/leaderboard/{msg.guild.id}'
 		try:
 			headers = {
 				'Accept': 'application/json'
 			}
-			r = requests.get(url, headers=headers)
+			async with self.session.get(url, headers=headers) as r:
+				data = await r.json()
 
 		except Exception as e:
 			logger.info(f'Error on Role_Management.roles(): {e}')
 			await msg.channel.send('Error while fetching mee6 levels!')
 			return
-		else:
-			data = r.json()
 
 		user_lvl = next(filter(lambda e: e['id'] == member.id, data), None)
 			
@@ -336,8 +333,10 @@ class Role_Management():
 			logger.info(f'User {member.display_name}, id {member.id} not found in mee6 lvl data')
 			return
 
+		role_data = Role_Data(msg.guild)
+
 		new_rank = None # The level of the new rank
-		for rank, lvl in Role_Data.ranks.items():
+		for rank, lvl in role_data.ranks.items():
 			if lvl <= user_lvl['level']:
 				new_rank = rank
 				break
@@ -347,12 +346,12 @@ class Role_Management():
 			logger.warn('Negative level??')
 			return
 
-		new_rank_id = self.ranks_ids.get(new_rank, None) # Get the closest existing rank for the required lvl
+		new_rank_id = role_data.ranks_ids.get(new_rank, None) # Get the closest existing rank for the required lvl
 		while new_rank_id is None:
 			if new_rank == 0:
 				break
 			new_rank -= 1
-			new_rank_id = self.ranks_ids.get(new_rank, None)
+			new_rank_id = role_data.ranks_ids.get(new_rank, None)
 		
 		if new_rank_id is None:
 			# No rank <= lvl
@@ -362,7 +361,7 @@ class Role_Management():
 		to_remove = []
 		add_role = True
 		for role in member.roles:
-			if role.id in self.ranks_ids.values():
+			if role.id in role_data.ranks_ids.values():
 				if role.id != new_rank_id:
 					to_remove.append(role)
 				else:
@@ -413,22 +412,34 @@ class Role_Management():
 			await ctx.respond('Error')
 			return
 
+		await self.get_session()
+
 		url = f'https://mee6.xyz/api/plugins/levels/leaderboard/{ctx.guild.id}'
 		try:
 			headers = {
 				'Accept': 'application/json'
 			}
-			r = requests.get(url, headers=headers)
+
+			async with self.session.get(url, headers=headers) as r:
+				data = await r.json()
 
 		except Exception as e:
 			logger.info(f'Error on Role_Management.roles(): {e}')
 			await ctx.respond('Error while fetching mee6 levels!')
 			return
-		else:
-			data = r.json()
+		
+		if 'status_code' in data:
+			if data['status_code'] == 401:
+				await ctx.respond('Mee6 leaderboard is private!')
+			elif data['status_code'] == 404:
+				await ctx.respond('Mee6 leaderboard doesn\'t exists!')
+			else:
+				logger.error('Unknown status_code: {data}')
+			return
 		level_data = {m['id']: m for m in data['players']}
 
 		added = {}
+		role_data = Role_Data(ctx.guild)
 
 		async for user in members:
 			if user.bot:
@@ -441,7 +452,7 @@ class Role_Management():
 				continue
 
 			new_rank = None
-			for rank, lvl in Role_Data.ranks.items():
+			for rank, lvl in role_data.ranks.items():
 				if lvl <= user_lvl['level']:
 					new_rank = rank
 					break
@@ -450,12 +461,12 @@ class Role_Management():
 				# User lvl < 0??
 				continue
 
-			new_rank_id = self.ranks_ids.get(new_rank, None)
+			new_rank_id = role_data.ranks_ids.get(new_rank, None)
 			while new_rank_id is None:
 				if new_rank == 0:
 					break
 				new_rank -= 1
-				new_rank_id = self.ranks_ids.get(new_rank, None)
+				new_rank_id = role_data.ranks_ids.get(new_rank, None)
 			
 			if new_rank_id is None:
 				continue
@@ -463,7 +474,7 @@ class Role_Management():
 			to_remove = []
 			add_role = True
 			for role in user.roles:
-				if role.id in self.ranks_ids.values():
+				if role.id in role_data.ranks_ids.values():
 					if role.id != new_rank_id:
 						to_remove.append(role)
 					else:
@@ -525,43 +536,64 @@ class Role_Management():
 		"Generate roles from a list of rules (admin only!)"
 
 		if not self.is_admin(ctx.author):
-			ctx.respond(f'Only the bot\'s admin can use this command!')
+			await ctx.respond(f'Only the bot\'s admin can use this command!')
+			return
 
 		await ctx.respond('Updating ranks:')
 		
-		with open('./bot_plugins/ranks/rank_data.json') as f:
-			data = json.load(f)
+		# with open('./bot_plugins/ranks/rank_data.json') as f:
+		# 	data = json.load(f)
+		role_data = Role_Data(ctx.guild)
+		data = role_data.guild_rank_data
+
+		last_position = None
 
 		use_icon = 'ROLE_ICONS' in ctx.guild.features
 
 		for rank in data:
-			kwargs = {k: True for k in self.get_role_perms(rank)}
+			kwargs = {k: True for k in role_data.get_role_perms(rank)}
 
 			usr_perms = discord.Permissions.none()
 			usr_perms.update(**kwargs)
 
 			name = rank['name']
-			# color = discord.Color.from_rgb(*rank['color'])
-	
+			if rank['color'] is not None:
+				color = discord.Color.from_rgb(*rank['color'])
+			else:
+				color = 0
+
 			role_id = rank['role_id']
 			if role_id is None:
-				await ctx.send(f'{name} role is unknown!')
-				continue
-			role = ctx.guild.get_role(role_id)
-
+				role = None
+			else:
+				role = ctx.guild.get_role(role_id)
+			
 			kwargs = {
 				'name':name, 
 				'permissions':usr_perms, 
-				# colour:color,
+				'colour': color,
 				'hoist':True,
 				'mentionable':False
 			}
+
+			if last_position is not None:
+				position = min(ctx.guild.me.top_role.position, last_position-1)
+				if position > 0:
+					last_position = position
+					kwargs['position'] = position
+			elif role is not None:
+				last_position = min(ctx.guild.me.top_role.position, role.position)
 
 			if use_icon:
 				icon = Role_Data.get_icon(rank['icon_css'])
 				kwargs['icon'] = icon
 
+			created = role is None
 			try:
+				if role is None:
+					role = await ctx.guild.create_role(name=kwargs['name'])
+					role_data.modify_rank(rank['name'], {'role_id':role.id})
+				
 				await role.edit(**kwargs)
 			except discord.Forbidden as e:
 				logger.warn(f'Forbidden for role: {role.name} - {e}')
@@ -569,20 +601,14 @@ class Role_Management():
 				logger.error(f'Error for role: {role.name}, {e}')
 			else:
 				log_perms = False
-				if log_perms:
-					perms_txt = ' - ' + ', '.join(kwargs.keys())
-				else:
-					perms_txt = ''
-				txt = f'{role.name}: {len(kwargs)} perms{perms_txt}'
+				perms = [k for k, v in iter(usr_perms) if v is True]
+				
+				perms_txt = (' - ' + ', '.join(perms)) if log_perms else ''
+				create_txt = 'Created -' if created else ''
+
+				txt = f'{role.name}: {create_txt} {len(perms)} perms{perms_txt}'
 				logger.info(txt)
 				await ctx.send(txt)
-
-	@classmethod
-	def get_role_perms(self, rank):
-		# lvl = Role_Data.ranks[rank]
-		lvl = rank['lvl']
-		perms = [k for i in range(lvl+1) for k in Role_Data.perms.get(i, [])]
-		return perms
 
 	async def register_roles(self, 
 		ctx,
@@ -604,14 +630,15 @@ class Role_Management():
 			return
 		
 		role_id = role.id
-		if lvl not in self.ranks_ids:
-			self.ranks_ids[lvl] = role_id
+		role_data = Role_Data(ctx.guild)
+		if lvl not in role_data.ranks_ids:
+			role_data.ranks_ids[lvl] = role_id
 			await ctx.respond(f'Role {role.display_name} is now level {lvl}!')
 		else:
 			text = f'Inserted {role.display_name} with level {lvl}!'
-			while lvl in self.ranks_ids:
-				next_role_id = self.ranks_ids[lvl]
-				self.ranks_ids[lvl] = role_id
+			while lvl in role_data.ranks_ids:
+				next_role_id = role_data.ranks_ids[lvl]
+				role_data.ranks_ids[lvl] = role_id
 				role_id = next_role_id
 				lvl += 1
 			await ctx.respond(text)

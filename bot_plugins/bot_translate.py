@@ -1,51 +1,54 @@
-#Discord_bot.py translate module
+# Discord_bot.py translate module
 
-import discord
 from discord.commands import Option
 import logging
 logger = logging.getLogger('helium_logger')
 
 try:
-	from googletrans import Translator, LANGUAGES
+    from googletrans import Translator, LANGUAGES
 except ImportError:
-	logger.info('googletrans module not found!')
-	exit()
+    logger.info('googletrans module not found!')
+    Translator = None
+
 
 class Translate:
-	"""Translate: trans"""
-	def initialize(self):
-		txt_cmds = {
-			self.translate: ['translate', 'uh', 'huh']
-		}
-		self.translator = Translator()
+    """Translate: trans"""
 
-		return txt_cmds
+    def initialize(self):
+        txt_cmds = {
+            self.translate: ['translate', 'uh', 'huh']
+        }
+        self.translator = Translator()
 
-	async def translate(self, 
-		ctx,
-		txt : Option(
-			str,
-			"The text you want to translate",
-			name="msg",
-			default=""),
-		):
-		"Translate a message or a text:\n > .uh J'aime les pâtes!"
+        return txt_cmds
 
-		msg = ctx.message
-		if txt != "":
-			orig = txt
-		elif msg.reference is not None and msg.reference.resolved is not None and hasattr(msg.reference.resolved, 'content') and msg.reference.resolved.content is not None:
-			orig = msg.reference.resolved.content
-		else:
-			await ctx.respond('You must specify a text or a message to translate!')
+    async def translate(self,
+                        ctx,
+                        txt: Option(
+                            str,
+                            "The text you want to translate",
+                            name="msg",
+                            default=""),
+                        ):
+        "Translate a message or a text:\n > .uh J'aime les pâtes!"
 
-		logger.info(f'Translating {orig}')
-		try:
-			trans = self.translator.translate(text=orig)
-		except Exception as e:
-			logger.warn(f'Error while translating {orig}: {e}')
-			await ctx.respond(f'Internal error while translating:sob:')
-		else:
-			await ctx.respond(f'From {LANGUAGES[trans.src].capitalize()}: {trans.text}')
+        msg = ctx.message
+        if txt != "":
+            orig = txt
+        elif msg.reference is not None and msg.reference.resolved is not None and hasattr(msg.reference.resolved, 'content') and msg.reference.resolved.content is not None:
+            orig = msg.reference.resolved.content
+        else:
+            await ctx.respond('You must specify a text or a message to translate!')
 
-module_class = Translate
+        logger.info(f'Translating {orig}')
+        try:
+            trans = self.translator.translate(text=orig)
+        except Exception as e:
+            logger.warn(f'Error while translating {orig}: {e}')
+            await ctx.respond(f'Internal error while translating:sob:')
+        else:
+            await ctx.respond(f'From {LANGUAGES[trans.src].capitalize()}: {trans.text}')
+
+
+if Translator is not None:
+    module_class = Translate

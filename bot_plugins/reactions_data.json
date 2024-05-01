@@ -1,0 +1,238 @@
+[
+    {
+        "action": "{author} is unfilling {target}",
+        "arg_desc": "The target to unfill.",
+        "commands": [
+            "unfill"
+        ],
+        "desc": "Unfill someone",
+        "name": "unfill",
+        "no_target": "{author} is getting unfilled",
+        "self_action": "{author} is getting unfilled"
+    },
+    {
+        "action": "{author} is filling {target}",
+        "arg_desc": "The target to fill up.",
+        "commands": [
+            "fill"
+        ],
+        "desc": "Fill up someone (bruh)",
+        "name": "fill",
+        "no_target": null,
+        "self_action": "{author} is filling up"
+    },
+    {
+        "action": "{author} kisses {target}",
+        "arg_desc": "The target to kiss.",
+        "commands": [
+            "kiss"
+        ],
+        "desc": "Kiss someone",
+        "name": "kiss",
+        "no_target": null,
+        "self_action": "{author} kisses himself??"
+    },
+    {
+        "action": "{author}: Welcome, {target} to T1T4N1UM Project!",
+        "arg_desc": "The user to welcome.",
+        "commands": [
+            "welcome"
+        ],
+        "desc": "Welcome someone",
+        "name": "welcome",
+        "no_target": null,
+        "self_action": "{author} welcomes himself"
+    },
+    {
+        "action": "{author} bangs {target}",
+        "arg_desc": "The person to bang.",
+        "commands": [
+            "bang",
+            "bangs"
+        ],
+        "desc": "Bangs someone",
+        "name": "bang",
+        "no_target": "BANG!",
+        "self_action": "{author} bangs himself?"
+    },
+    {
+        "action": "{author} hugs {target}",
+        "arg_desc": "The person to hug.",
+        "commands": [
+            "hug",
+            "hugs"
+        ],
+        "desc": "Hugs someone",
+        "name": "hug",
+        "no_target": "{author} is hugging himself, and starts crying...",
+        "self_action": "{author} is hugging himself, and starts crying..."
+    },
+    {
+        "action": "{author} kicks {target}",
+        "arg_desc": "The person to kick.",
+        "commands": [
+            "kick",
+            "kicks"
+        ],
+        "desc": "Kicks someone",
+        "name": "kick",
+        "no_target": null,
+        "self_action": "{author} kicks himself?"
+    },
+    {
+        "action": "{author} punches {target}",
+        "arg_desc": "The person to punch.",
+        "commands": [
+            "punch",
+            "punches",
+            "punchs"
+        ],
+        "desc": "Punchs someone",
+        "name": "punch",
+        "no_target": null,
+        "self_action": "{author} punches himself?"
+    },
+    {
+        "action": "{author} is crying because of {target}",
+        "arg_desc": "The person who made you cry.",
+        "commands": [
+            "cry",
+            "cries"
+        ],
+        "desc": "Cries",
+        "name": "cry",
+        "no_target": "{author} cries",
+        "self_action": "{author} cries on himself?"
+    },
+    {
+        "action": "{author} licks {target}",
+        "arg_desc": "The person you want to lick.",
+        "commands": [
+            "lick",
+            "licks"
+        ],
+        "desc": "Licks someone",
+        "name": "lick",
+        "no_target": null,
+        "self_action": "{author} licks himself?"
+    },
+    {
+        "action": "{author} sucks {target}",
+        "arg_desc": "The person you want to suck.",
+        "commands": [
+            "suck",
+            "sucks"
+        ],
+        "desc": "Sucks someone",
+        "name": "suck",
+        "no_target": "{author} sucks",
+        "self_action": "{author} sucks himself"
+    },
+    {
+        "action": "{author} cums in {target}",
+        "arg_desc": "The person you want to cum on.",
+        "commands": [
+            "cum",
+            "cums"
+        ],
+        "desc": "Cum (in someone)",
+        "name": "cum",
+        "no_target": "{author} is cumming",
+        "self_action": "{author} is cumming"
+    },
+    {
+        "action": "{author} dodges {target}",
+        "arg_desc": "The person you want to dodge",
+        "commands": [
+            "dodge",
+            "dodges"
+        ],
+        "desc": "Dodge",
+        "name": "dodge",
+        "no_target": "{author} dodges",
+        "self_action": "{author} dodges"
+    },
+    {
+        "action": "{author} heals {target}",
+        "arg_desc": "The person you want to heal.",
+        "commands": [
+            "heal",
+            "heals"
+        ],
+        "desc": "Heals (someone)",
+        "name": "heal",
+        "no_target": "{author} is healing",
+        "self_action": "{author} heals himself"
+    },
+    {
+        "action": "{author} farts on {target}",
+        "arg_desc": "The person you want to fart on.",
+        "commands": [
+            "fart",
+            "farts"
+        ],
+        "desc": "Fart (on someone)",
+        "name": "fart",
+        "no_target": "{author} farted!",
+        "self_action": "{author} farts on himself"
+    },
+    {
+        "action": "{author} won against {target}",
+        "arg_desc": "The person you have beaten",
+        "commands": [
+            "win",
+            "wins"
+        ],
+        "desc": "Win (against someone)",
+        "name": "win",
+        "no_target": "{author} wins",
+        "self_action": "{author} is the winner!"
+    },
+    {
+        "action": "{author} lost against {target}",
+        "arg_desc": "The person you lost to",
+        "commands": [
+            "lose",
+            "lost"
+        ],
+        "desc": "Lose (against someone)",
+        "name": "lose",
+        "no_target": "{author} loses",
+        "self_action": "{author} lost"
+    },
+    {
+        "action": "{author} threw a pan at {target}",
+        "arg_desc": "The person you want to throw the pan to.",
+        "commands": [
+            "pan"
+        ],
+        "desc": "Throw a pan (at someone)",
+        "name": "pan",
+        "no_target": "{author} threw a pan.",
+        "self_action": "{author} hits himself with a pan?"
+    },
+    {
+        "action": "{author} is laughing at {target}",
+        "arg_desc": "The person you laugh at",
+        "commands": [
+            "laugh",
+            "lol"
+        ],
+        "desc": "Laugh (at someone)",
+        "name": "laugh",
+        "no_target": "{author} laugh",
+        "self_action": "{author} is laughing at himself"
+    },
+    {
+        "action": "{author} left {target}",
+        "arg_desc": "The person you want to leave",
+        "commands": [
+            "leave",
+            "left"
+        ],
+        "desc": "Leaves (someone)",
+        "name": "leave",
+        "no_target": "{author} leaves",
+        "self_action": "{author} left the chat!"
+    }
+]

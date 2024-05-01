@@ -1,0 +1,255 @@
+[{
+        "rank": 30,
+        "name": null,
+        "lvl": 76,
+        "perms": null,
+        "role_id": null
+    },
+    {
+        "rank": 29,
+        "name": "Warden",
+        "lvl": 74,
+        "perms": null,
+        "role_id": 977260499320324176
+    },
+    {
+        "rank": 28,
+        "name": "Wither",
+        "lvl": 72,
+        "perms": null,
+        "role_id": 977260329027375214
+    },
+    {
+        "rank": 27,
+        "name": "Ender Dragon",
+        "lvl": 70,
+        "perms": null,
+        "role_id": 977260419502731295
+    },
+    {
+        "rank": 26,
+        "name": "Shulker",
+        "lvl": 68,
+        "perms": null,
+        "role_id": 977260008305737809
+    },
+    {
+        "rank": 25,
+        "name": "Enderman",
+        "lvl": 66,
+        "perms": null,
+        "role_id": 977259295278264370
+    },
+    {
+        "rank": 24,
+        "name": "Wither Skleton",
+        "lvl": 64,
+        "perms": null,
+        "role_id": 977259286352756746
+    },
+    {
+        "rank": 23,
+        "name": "Ghast",
+        "lvl": 62,
+        "perms": null,
+        "role_id": 977259281009246298
+    },
+    {
+        "rank": 22,
+        "name": "Blaze",
+        "lvl": 60,
+        "perms": null,
+        "role_id": 977259276596805632
+    },
+    {
+        "rank": 21,
+        "name": "Magma Cube",
+        "lvl": 58,
+        "perms": null,
+        "role_id": 977259290794537050
+    },
+    {
+        "rank": 20,
+        "name": "Piglin",
+        "lvl": 55,
+        "perms": null,
+        "role_id": 977259272033407037
+    },
+    {
+        "rank": 19,
+        "name": "Guardian",
+        "lvl": 52,
+        "perms": null,
+        "role_id": 977259267482599494
+    },
+    {
+        "rank": 18,
+        "name": "Phantom",
+        "lvl": 48,
+        "perms": null,
+        "role_id": 977259179137957951
+    },
+    {
+        "rank": 17,
+        "name": "Creeper AWW MAN",
+        "lvl": 44,
+        "perms": null,
+        "role_id": 977259004193562656
+    },
+    {
+        "rank": 16,
+        "name": "Skeleton",
+        "lvl": 40,
+        "perms": null,
+        "role_id": 977258836865990716
+    },
+    {
+        "rank": 15,
+        "name": "Zombie",
+        "lvl": 37,
+        "perms": null,
+        "role_id": 977258724160856136
+    },
+    {
+        "rank": 14,
+        "name": "Ender Egg",
+        "lvl": 34,
+        "perms": [],
+        "role_id": 974231330705534996
+    },
+    {
+        "rank": 13,
+        "name": "Beacon",
+        "lvl": 31,
+        "perms": [],
+        "role_id": 974231044209385502
+    },
+    {
+        "rank": 12,
+        "name": "Nether Star",
+        "lvl": 29,
+        "perms": [],
+        "role_id": 976014698971529228
+    },
+    {
+        "rank": 11,
+        "name": "Emerald",
+        "lvl": 26,
+        "perms": [],
+        "role_id": 839779416326537237
+    },
+    {
+        "rank": 10,
+        "name": "Netherite",
+        "lvl": 23,
+        "perms": [
+            "manage_roles",
+            "manage_webhooks",
+            "view_audit_log"
+        ],
+        "role_id": 878564206025248788
+    },
+    {
+        "rank": 9,
+        "name": "Diamond",
+        "lvl": 20,
+        "perms": [
+            "manage_emojis",
+            "manage_events",
+            "start_embedded_activities"
+        ],
+        "role_id": 839779276924649472
+    },
+    {
+        "rank": 8,
+        "name": "Amethyst",
+        "lvl": 18,
+        "perms": [
+            "manage_threads",
+            "priority_speaker"
+        ],
+        "role_id": 974004158355079228
+    },
+    {
+        "rank": 7,
+        "name": "Gold",
+        "lvl": 15,
+        "perms": [
+            "deafen_members",
+            "move_members"
+        ],
+        "role_id": 839771240066580500
+    },
+    {
+        "rank": 6,
+        "name": "Redstone",
+        "lvl": 13,
+        "perms": [
+            "manage_messages",
+            "mute_members"
+        ],
+        "role_id": 839771165144121364
+    },
+    {
+        "rank": 5,
+        "name": "Lapis",
+        "lvl": 10,
+        "perms": [
+            "create_private_threads",
+            "create_public_threads",
+            "manage_nicknames"
+        ],
+        "role_id": 839771065366347777
+    },
+    {
+        "rank": 4,
+        "name": "Iron",
+        "lvl": 8,
+        "perms": [
+            "change_nickname",
+            "send_tts_messages"
+        ],
+        "role_id": 839771007656001546
+    },
+    {
+        "rank": 3,
+        "name": "Copper",
+        "lvl": 5,
+        "perms": [
+            "attach_files",
+            "external_stickers",
+            "request_to_speak"
+        ],
+        "role_id": 917778148798648321
+    },
+    {
+        "rank": 2,
+        "name": "Coal",
+        "lvl": 3,
+        "perms": [
+            "add_reactions",
+            "embed_links",
+            "read_message_history",
+            "stream",
+            "use_slash_commands"
+        ],
+        "role_id": 839770919039402004
+    },
+    {
+        "rank": 1,
+        "name": "Dirt",
+        "lvl": 0,
+        "perms": [
+            "connect",
+            "create_instant_invite",
+            "external_emojis",
+            "read_messages",
+            "send_messages",
+            "speak",
+            "send_messages_in_threads",
+            "use_voice_activation",
+            "view_channel"
+        ],
+        "role_id": 917774707049254982
+    }
+]

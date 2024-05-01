@@ -1,4 +1,4 @@
-#Discord_bot.py misc module
+# Discord_bot.py help module
 
 import discord
 
@@ -6,101 +6,113 @@ from discord.ext import bridge, pages
 import logging
 logger = logging.getLogger('helium_logger')
 
+
 class Help:
-	"""Help: test_help"""
-	def initialize(self):
-		txt_cmds = {
-			self.help_cmd: ['help'],
-		}
+    """Help: test_help"""
 
-		return txt_cmds
+    def initialize(self):
+        txt_cmds = {
+            self.help_cmd: ['help'],
+        }
 
-	async def help_cmd(self, 
-		ctx,
-		):
-		"Show Helium's help:\n > .help (cat)"
+        self.registered_commands = {}
 
-		help_pages = []
+        return txt_cmds
 
-		for p in self.plugins:
-			try:
-				pagegroup = self.get_help_pagegroup(p)
-				if pagegroup is not None:
-					help_pages.append(pagegroup)
-			except Exception as e:
-				logger.warn(f'Error on help, module {p}: {e}')
-				pass
+    async def help_cmd(self,
+                       ctx,
+                       ):
+        "Show Helium's help:\n > .help (cat)"
 
-		paginator = pages.Paginator(pages=help_pages, show_menu=True, show_disabled=False)
-		if isinstance(ctx, bridge.BridgeExtContext):
-			await paginator.send(ctx, target=ctx.author, target_message="Help page has been sent in your DMs!")
-		elif isinstance(ctx, bridge.BridgeApplicationContext):
-			await paginator.respond(ctx.interaction, target=ctx.interaction.user, target_message="Help page has been sent in your DMs!")
+        help_pages = []
 
-	def get_help_pagegroup(self, p):
-		name, arg = p.__doc__.split(':')
-		name, arg = name.strip(), arg.strip()
-		if name.startswith('(Admin)'):
-			return None
+        for p in self.plugins:
+            try:
+                pagegroup = self.get_help_pagegroup(p)
+                if pagegroup is not None:
+                    help_pages.append(pagegroup)
+            except Exception as e:
+                logger.warn(f'Error on help, module {p}: {e}')
 
-		txt_cmds = p.initialize(self)
-		if isinstance(txt_cmds, tuple):
-			# (txt_cmds, events)
-			txt_cmds = txt_cmds[0]
+        if ctx.channel.type in (discord.ChannelType.private, discord.ChannelType.group):
+            target_message = 'Here is the bot\'s help!'
+        else:
+            target_message = "Help page has been sent in your DMs!"
 
-		max_lines = 10
-		help_pages = []
-		docs = []
-		lines = 0
-		i = 1
-		for f, keys in txt_cmds.items():
-			doc = f.__doc__
-			if doc is not None and '(admin only!)' not in doc:
-				field = {
-					'name': ' | '.join(map(lambda e: '.' + e, keys)),
-					'value': doc
-				}
-				docs.append(field)
-				lines += doc.count('\n') + 1
+        paginator = pages.Paginator(
+            pages=help_pages, show_menu=True, show_disabled=False)
 
-			if lines >= max_lines:
-				emb = {
-					"type": "rich",
-					"title": f"Helium's help - {name}",
-					"description": f"All commands available with Helium's {name} module:",
-					"color": 0x00FFFF,
-					"fields": docs
-				}
-				emb = discord.Embed.from_dict(emb)
-				page = pages.Page(
-					content = f"Helium's help - {name} - page {i + len(help_pages)}",
-					embeds = [emb]
-				)
-				help_pages.append(page)
-				docs = []
-				lines = 0
+        if isinstance(ctx, bridge.BridgeExtContext):
+            await paginator.send(ctx, target=ctx.author, target_message=target_message)
+        elif isinstance(ctx, bridge.BridgeApplicationContext):
+            await paginator.respond(ctx.interaction, target=ctx.interaction.user, target_message=target_message)
 
-		if len(docs) > 0:
-			emb = {
-				"type": "rich",
-				"title": f"Helium's help - {name}",
-				"description": f"All commands available with Helium's {name} module:",
-				"color": 0x00FFFF,
-				"fields": docs
-			}
-			emb = discord.Embed.from_dict(emb)
-			page = pages.Page(
-				content = f"Helium's help - {name} - page {i + len(help_pages)}",
-				embeds = [emb]
-			)
-			help_pages.append(page)
+    def get_help_pagegroup(self, p):
+        name, arg = p.__doc__.split(':')
+        name, arg = name.strip(), arg.strip()
+        if name.startswith('(Admin)'):
+            return None
 
-		group = pages.PageGroup(
-			pages=help_pages,
-			label=f"{name} module",
-			description=f"Help for {name} module",
-		)
+        txt_cmds = self.registered_commands[p]
+        # txt_cmds = p.initialize(self)
+        # if isinstance(txt_cmds, tuple):
+        # 	# (txt_cmds, events)
+        # 	txt_cmds = txt_cmds[0]
 
-		return group
+        max_lines = 10
+        help_pages = []
+        docs = []
+        lines = 0
+        i = 1
+        for f, keys in txt_cmds.items():
+            doc = f.__doc__
+            if doc is not None and '(admin only!)' not in doc:
+                field = {
+                    'name': ' | '.join(map(lambda e: '.' + e, keys)),
+                    'value': doc
+                }
+                docs.append(field)
+                lines += doc.count('\n') + 1
+
+            if lines >= max_lines:
+                emb = {
+                    "type": "rich",
+                    "title": f"Helium's help - {name}",
+                    "description": f"All commands available with Helium's {name} module:",
+                    "color": 0x00FFFF,
+                    "fields": docs
+                }
+                emb = discord.Embed.from_dict(emb)
+                page = pages.Page(
+                    content=f"Helium's help - {name} - page {i + len(help_pages)}",
+                    embeds=[emb]
+                )
+                help_pages.append(page)
+                docs = []
+                lines = 0
+
+        if len(docs) > 0:
+            emb = {
+                "type": "rich",
+                "title": f"Helium's help - {name}",
+                "description": f"All commands available with Helium's {name} module:",
+                "color": 0x00FFFF,
+                "fields": docs
+            }
+            emb = discord.Embed.from_dict(emb)
+            page = pages.Page(
+                content=f"Helium's help - {name} - page {i + len(help_pages)}",
+                embeds=[emb]
+            )
+            help_pages.append(page)
+
+        group = pages.PageGroup(
+            pages=help_pages,
+            label=f"{name} module",
+            description=f"Help for {name} module",
+        )
+
+        return group
+
 
 module_class = Help

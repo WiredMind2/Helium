@@ -1,7 +1,6 @@
 #Discord_bot.py mc logger module
 
 import discord
-from discord import Option
 
 import socket
 import json

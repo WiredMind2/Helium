@@ -1,14 +1,13 @@
 #Discord_bot.py reaction_choice module
 
-import asyncio
 import logging
+
 logger = logging.getLogger('helium_logger')
 
 import discord
-from discord import Option
 
 class Reaction_Choice:
-	"""(Admin) Reaction choice: choice"""
+	"""Reaction choice: choice"""
 	def initialize(self):
 		txt_cmds = {
 			self.choice_create: ['choice_create', 'create_choice'],
@@ -19,7 +18,8 @@ class Reaction_Choice:
 		}
 
 		events = {
-			'on_reaction_add': self.check_reaction
+			'on_reaction_add': self.check_reaction_add,
+			'on_reaction_remove': self.check_reaction_remove
 		}
 
 		if not hasattr(self, 'choices_data'):
@@ -27,25 +27,28 @@ class Reaction_Choice:
 
 		return txt_cmds, events
 
+	@discord.option(
+		"title",
+		description="The title"
+	)
+	@discord.option(
+		"description",
+		description="The description"
+	)
+	@discord.option(
+		"color",
+		description="The color, in hex"
+	)
 	async def choice_create(self, 
 		ctx,
-		title : Option(
-			str,
-			"The title",
-			name="title"),
-		desc : Option(
-			str,
-			"The description",
-			name="description"),
-		col : Option(
-			str,
-			"The color, in hex",
-			name="color")
+		title : str,
+		desc : str,
+		col : str = None
 		):
 		"Create a new reaction choice"
 
 		if not self.is_admin(ctx.author):
-			ctx.respond('This command is for admins only!')
+			await ctx.respond('This command is for admins only!')
 			return
 
 		if title in (data['title'] for data in self.choices_data.values()):
@@ -62,8 +65,8 @@ class Reaction_Choice:
 				return
 
 		data = {
-			'guild': ctx.guild,
-			'channel': ctx.channel,
+			'guild': ctx.guild.id,
+			'channel': ctx.channel.id,
 			'title': title,
 			'description': desc,
 			'color': col,
@@ -72,32 +75,36 @@ class Reaction_Choice:
 
 		emb, emojis = self.format_reaction(data)
 
-		m_id = ctx.send(emb)
+		msg = await ctx.send(embed=emb)
+		m_id = msg.id
 		data['id'] = m_id
 
 		self.choices_data[m_id] = data
 
+		await ctx.hidden('Done', delete_after=5*60) # 5 mins
+
+	@discord.option(
+		"title",
+		description="The title of the choice to modify"
+	)
+	@discord.option(
+		"description",
+		description="The new description"
+	)
+	@discord.option(
+		"color",
+		description="The new color, in hex"
+	)
 	async def choice_modify(self, 
 		ctx,
-		title : Option(
-			str,
-			"The title of the choice to modify",
-			name="title"),
-		desc : Option(
-			str,
-			"The new description",
-			name="description",
-			default=None)=None,
-		col : Option(
-			str,
-			"The new color, in hex",
-			name="color",
-			default=None)=None
+		title : str,
+		desc : str = None,
+		col : str = None
 		):
 		"Modify a reaction choice"
 
 		if not self.is_admin(ctx.author):
-			ctx.respond('This command is for admins only!')
+			await ctx.respond('This command is for admins only!')
 			return
 
 		found = False
@@ -111,48 +118,56 @@ class Reaction_Choice:
 			return
 
 		if desc is not None:
-			data['desc'] = desc
+			data['description'] = desc
 
 		if col is not None:
 			try:
 				col = int(col, 16)
 			except ValueError:
-				ctx.respond(f'{col} is an invalid hex color!')
+				await ctx.respond(f'{col} is an invalid hex color!')
 				return
 
-			data['col'] = col
+			data['color'] = col
 
 		emb, emojis = self.format_reaction(data)
-		m_id = data['id']
-		# msg = find msg from id
-		# await msg.modify(embed=emb)
-
+		try:
+			msg = await self.get_message_from_data(data)
+			await msg.edit(embed=emb)
+		except discord.NotFound:
+			await ctx.respond('Choice was not found!')
+			logger.warning(f'Msg id {data["id"]} was not found!')
 		self.choices_data[data['id']] = data
 
+		await ctx.hidden('Done', delete_after=5*60) # 5 mins
+
+
+	@discord.option(
+		"title",
+		description="The title of the choice to modify"
+	)
+	@discord.option(
+		"emoji",
+		description="The emoji reaction"
+	)
+	@discord.option(
+		"role",
+		description="The role associated"
+	)
+	@discord.option(
+		"desc",
+		description="The description for that choice"
+	)
 	async def choice_add_reaction(self, 
 		ctx,
-		title : Option(
-			str,
-			"The title of the choice to modify",
-			name="title"),
-		emoji : Option(
-			str,
-			"The emoji reaction",
-			name="emoji"),
-		role : Option(
-			discord.Role,
-			"The role associated",
-			name="role"),
-		desc : Option(
-			str,
-			"The description for that choice",
-			name="description",
-			default=None)=None,
+		title : str,
+		emoji : str,
+		role : discord.Role,
+		desc : str = None,
 		):
 		"Add a reaction to a reaction choice"
 
 		if not self.is_admin(ctx.author):
-			ctx.respond('This command is for admins only!')
+			await ctx.respond('This command is for admins only!')
 			return
 
 		found = False
@@ -168,34 +183,64 @@ class Reaction_Choice:
 		if desc is None:
 			desc = role.name
 
-		if role in (react['role'] for react in data['reactions']):
-			await ctx.respond(f"There is already a reaction with role '{role}'!")
+		if role.id in (react['role'] for react in data['reactions']):
+			await ctx.respond(f"There is already a reaction with that role!")
 			return
 
 		reaction = {
 			'emoji': emoji,
-			'desc': desc,
-			'role': role
+			'description': desc,
+			'role': role.id
 		}
 
-		data['reactions'].append(reaction)
-		self.choices_data[m_id] = data
+		# Fetch message object
+		try:
+			msg = await self.get_message_from_data(data)
+		except discord.NotFound:
+			await ctx.respond(f'The choice was not found!')
+			logger.warning(f'Msg id {data["id"]} was not found!')
+			return
 
+		# Update embed content
+		emb, emojis = self.format_reaction(data)
+		try:
+			await msg.edit(embed=emb)
+		except discord.Forbidden:
+			await ctx.respond('I don\'t have the permissions to edit the message!')
+
+		# Add the emoji
+		try:
+			await msg.add_reaction(emoji)
+		except discord.Forbidden:
+			await ctx.respond('I don\'t have the permissions to add an emoji!')
+			return
+		except discord.InvalidArgument:
+			await ctx.respond(f'{emoji} is an invalid emoji!')
+			return
+
+		data['reactions'].append(reaction)
+		self.choices_data[data['id']] = data
+
+		await ctx.hidden('Done', delete_after=5*60) # 5 mins
+
+
+	@discord.option(
+		"title",
+		description="The title of the choice to modify"
+	)
+	@discord.option(
+		"role",
+		description="The role associated"
+	)
 	async def choice_remove_reaction(self, 
 		ctx,
-		title : Option(
-			str,
-			"The title of the choice to modify",
-			name="title"),
-		role : Option(
-			discord.Role,
-			"The role associated",
-			name="role")
+		title : str,
+		role : discord.Role
 		):
 		"Remove a reaction to a reaction choice"
 
 		if not self.is_admin(ctx.author):
-			ctx.respond('This command is for admins only!')
+			await ctx.respond('This command is for admins only!')
 			return
 
 		found = False
@@ -210,7 +255,7 @@ class Reaction_Choice:
 
 		found = False
 		for react in data['reactions']:
-			if role == react['role']:
+			if role.id == react['role']:
 				found = True
 				data['reactions'].remove(react)
 				self.choices_data[data['id']] = data
@@ -219,18 +264,24 @@ class Reaction_Choice:
 		if not found:
 			await ctx.respond(f"Role '{role.name}' hasn't been added on reaction with title '{title}'!")
 			return
+		
+		# TODO
 
+		await ctx.hidden('Done', delete_after=5*60) # 5 mins
+
+
+	@discord.option(
+		"title",
+		description="The title of the choice to delete"
+	)
 	async def choice_delete(self, 
 		ctx,
-		title : Option(
-			str,
-			"The title of the choice to delete",
-			name="title")
+		title : str
 		):
 		"Delete a reaction choice"
 
 		if not self.is_admin(ctx.author):
-			ctx.respond('This command is for admins only!')
+			await ctx.respond('This command is for admins only!')
 			return
 
 		found = False
@@ -245,37 +296,75 @@ class Reaction_Choice:
 
 		m_id = data['id']
 		# msg = find msg from id
-		await msg.delete() # TODO - Errors handling
+		try:
+			msg = await self.get_message_from_data(data)
+			await msg.delete() # TODO - Errors handling
+		except discord.NotFound:
+			await ctx.respond('The choice was not found!')
+			logger.warning(f'Msg id {id} raised NotFound exception on choice_delete')
 		del self.choices_data[m_id]
+		
+		await ctx.hidden('Done', delete_after=5*60) # 5 mins
 
-	async def check_reaction(self, reaction, user):
-		m_id = reaction.msg.id
+	async def check_reaction(self, add, reaction, user):
+		if reaction.message.author.bot: # Bot shouldn't get perms
+			return
+		m_id = reaction.message.id
 		if m_id in self.choices_data:
 			data = self.choices_data[m_id]
 			emoji = reaction.emoji
-			for react_data in data:
+			for react_data in data['reactions']:
 				if emoji == react_data['emoji']:
-					await user.add_roles(react_data['role'])
+					role_id = react_data['role']
+					if add is True:
+						await user.add_roles(discord.Object(id=role_id))
+					else:
+						await user.remove_roles(discord.Object(id=role_id))
 					return
 
 			# Unknown emoji
-			await reaction.delete()
+			await reaction.remove()
 
+	async def check_reaction_add(self, reaction, user):
+		return await self.check_reaction(True, reaction, user)
+	
+	async def check_reaction_remove(self, reaction, user):
+		return await self.check_reaction(False, reaction, user)
+	
 	def format_reaction(self, reaction):
-		desc = reaction['desc']
+		desc = reaction['description']
 		emojis = []
 
 		for role_data in reaction['reactions']:
-			desc += f"\n{role_data['emoji']}: {role_data['desc']}"
+			desc += f"\n{role_data['emoji']}: {role_data['description']}"
 			emojis.append(role_data['emoji'])
-		
+
 		emb = {
 			'type': 'rich',
 			'title': reaction['title'],
 			'description': desc,
-			'color': reaction['col']
+			'color': reaction['color']
 		}
 
+		emb = discord.Embed.from_dict(emb)
+
 		return emb, emojis
+
+	async def get_message_from_data(self, data):
+		msg = self.get_message(data['id']) # Cache
+		if msg is not None:
+			return msg
+		else:
+			guild = self.get_guild(data['guild']) # Cache
+			if guild is not None:
+				channel = guild.get_channel(data['channel']) # Cache
+
+			if channel is None:
+				# No need to get guild first
+				channel = await guild.fetch_channel(data['channel']) # API
+
+			msg = await channel.fetch_message(data['id']) # API
+			return msg
+
 
 module_class = Reaction_Choice
